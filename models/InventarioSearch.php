@@ -60,6 +60,30 @@ class InventarioSearch extends Inventario
                 
         return intval($resultado);     
     }
+
+    /**
+     * Obtenemos la cantidad de productos que estan por vencer en 10 dias
+     * @return int
+     */
+    private function cantidadProductoPorVencer() {
+        $query = new \yii\db\Query();
+        $fecha_limite_min = date('Y-m-d');
+        $fecha_limite_max = date('Y-m-d',strtotime(date('Y-m-d').' +10 day'));
+        
+        $query->select([
+            'cantidad_por_vencer'=>'count(productoid)',
+        ]);
+        $query->from(['inventario']);
+        $query->where(['between', 'fecha_vencimiento', $fecha_limite_min, $fecha_limite_max]);
+        $query->andWhere(['egresoid' => null]);
+        $query->andWhere(['falta' => 0]);
+
+        $command = $query->createCommand();        
+        $rows = $command->queryAll();
+        $resultado = ($rows[0]['cantidad_por_vencer']=='')?0:$rows[0]['cantidad_por_vencer'];
+        
+        return intval($resultado);     
+    }
     
     /**
      * Obtenemos la cantidad de productos faltantes en el inventario
@@ -236,7 +260,7 @@ class InventarioSearch extends Inventario
         $coleccion = array();
         foreach ($dataProvider->getModels() as $value) {
             $item = $value->toArray();
-            $item['cantidad'] = $value->cantidad;
+            $item['cantidad'] = intval($value->cantidad);
                         
             $producto = (isset($value->producto)?$value->producto->toArray():['producto'=>[]]);
             
@@ -255,6 +279,7 @@ class InventarioSearch extends Inventario
         $data['cantidad_vencidos'] = $this->cantidadVencidos();
         $data['cantidad_faltantes'] = $this->cantidadFaltantes();
         $data['cantidad_defectuosos'] = $this->cantidadDefectuosos();
+        $data['cantidad_por_vencer'] = $this->cantidadProductoPorVencer();
         $data['cantidad_stock'] = $this->cantidadStock();
         $data['resultado']=$coleccion;
         

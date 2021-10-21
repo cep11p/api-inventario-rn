@@ -5,6 +5,7 @@ namespace app\models;
 use Yii;
 use yii\base\Exception;
 use \app\models\base\Inventario as BaseInventario;
+use app\models\Inventario as Inventario;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -66,7 +67,7 @@ class Inventario extends BaseInventario
     }
     
     /**
-     * Vamos a setear los item que resultaron defectuosos
+     * Vamos a setear los item que resultaron defectuosos. Por lo tanto debemos buscar los productos que cumplan la condicion de busqueda
      * @param array $param
      * @return type
      * @throws Exception
@@ -75,11 +76,7 @@ class Inventario extends BaseInventario
         
         if(!isset($param['productoid']) || empty($param['productoid'])){
             throw new Exception('Se requiere el atributo productoid');
-        }
-        
-        if(!isset($param['fecha_vencimiento']) || !\app\components\Help::validateDate($param['fecha_vencimiento'], 'Y-m-d')){
-            throw new Exception('La fecha es obligatoria y debe tener el formato aaaa-mm-dd');
-        }
+        }        
 
         if(!isset($param['cantidad']) || !is_numeric($param['cantidad']) || intval($param['cantidad'])<=0){
             throw new Exception('La cantidad debe ser un numero mayor a 0');
@@ -88,22 +85,12 @@ class Inventario extends BaseInventario
         if(!isset($param['defectuoso'])){
             throw new Exception('El atributo defectuoso es obligatorio');
         }
-        
-        $defectuoso = \app\components\Help::setBoolean($param['defectuoso']);
 
         $condicion['egresoid'] = null;
         $condicion['defectuoso'] = 0;
         $condicion['falta'] = 0;
         $condicion['productoid'] = $param['productoid'];
-        $condicion['fecha_vencimiento'] = $param['fecha_vencimiento'];
-        
-        $newValues = ['defectuoso'=>1,'fecha_vencimiento'=>$param['fecha_vencimiento']];
-        
-        // Cambiamos las condiciones y los valores si defectuoso es falso
-        if($param['defectuoso'] == false){
-            $condicion['defectuoso'] = 1;
-            $newValues['defectuoso'] = 0;
-        }
+        $condicion['fecha_vencimiento'] = (isset($param['fecha_vencimiento']) && !empty($param['fecha_vencimiento']))?$param['fecha_vencimiento']:null;
         
         $ids = $this->buscarItem($condicion);
 
@@ -111,10 +98,17 @@ class Inventario extends BaseInventario
             throw new Exception('No se encontraron productos para modificar');
         } 
         if(isset($cantidad) && count($ids)<$cantidad){
-            throw new Exception('La cantidad a modificar es mayor a la cantidad de productos existentes en el inventario ('. count($producto_encontroado_lista).')');
+            throw new Exception('La cantidad a modificar es mayor a la cantidad de productos existentes en el inventario ('. count($ids).')');
         } 
+
+        for ($i=0; $i < $param['cantidad']; $i++) { 
+            $item = Inventario::findOne(['id' => $ids[$i]]);
+            $item->defectuoso = 1;
+            $item->save();
+        }
         
-        $resultado = Inventario::updateAll($newValues, ['id'=>$ids]);
+        $resultado['cantidad'] = $i;
+
         return $resultado;
     }
     

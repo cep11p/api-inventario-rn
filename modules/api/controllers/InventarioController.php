@@ -94,11 +94,11 @@ class InventarioController extends ActiveController{
         $model = new Inventario();
         $transaction = Yii::$app->db->beginTransaction();
         try {            
-            $model->setItemDefectuoso($param);
+            $resultado = $model->setItemDefectuoso($param);
 
             $transaction->commit();
             
-            $resultado['message']='Se registra el/los productos defectuosos';
+            $resultado['message']="Se registra ".$resultado['cantidad']." producto/s defectuoso/s";
             
             return  $resultado;
            

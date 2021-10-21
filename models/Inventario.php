@@ -5,7 +5,6 @@ namespace app\models;
 use Yii;
 use yii\base\Exception;
 use \app\models\base\Inventario as BaseInventario;
-use app\models\Inventario as Inventario;
 use yii\helpers\ArrayHelper;
 
 /**

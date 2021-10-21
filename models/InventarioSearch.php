@@ -16,6 +16,8 @@ class InventarioSearch extends Inventario
     public $unidad_medidaid;
     public $unidad;
     public $marcaid;
+    public $por_vencer; //bool logico para filtrados
+
     
     /**
     * @inheritdoc
@@ -24,7 +26,7 @@ class InventarioSearch extends Inventario
     {
         return [
             [['comprobanteid', 'productoid', 'defectuoso', 'egresoid', 'depositoid', 'id', 'falta','categoriaid','unidad_medidaid','unidad','marcaid'], 'integer'],
-            [['fecha_vencimiento','cantidad','vencido'], 'safe'],
+            [['fecha_vencimiento','cantidad','vencido','por_vencer'], 'safe'],
             [['precio_unitario'], 'number'],
         ];
     }
@@ -236,6 +238,13 @@ class InventarioSearch extends Inventario
             $query->andWhere(['defectuoso' => $this->defectuoso]);
         }else if($this->vencido == 'true'){
             $query->andWhere(['<=','fecha_vencimiento', date('Y-m-d')]);
+        }else if($this->por_vencer == 'true'){
+            $fecha_limite_min = date('Y-m-d');
+            $fecha_limite_max = date('Y-m-d',strtotime(date('Y-m-d').' +10 day'));
+
+            $query->where(['between', 'fecha_vencimiento', $fecha_limite_min, $fecha_limite_max]);
+            $query->andWhere(['egresoid' => null]);
+            $query->andWhere(['falta' => 0]);
         }else{ //Todos los productos en stock
             $query->andWhere(['defectuoso' => 0]);
             $query->andWhere(['or',

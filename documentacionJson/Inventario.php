@@ -22,6 +22,7 @@
  * sort=categoriaid (ordenamiento asc)
  * sort=-fecha_vencimiento (ordenamiento desc)
  * sort=fecha_vencimiento (ordenamiento asc)
+ * por_vencer=true se busca los que se estan por vencer en 10 dias
 * @method GET
 * @arrayReturn
 {

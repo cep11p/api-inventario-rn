@@ -203,6 +203,9 @@ class InventarioSearch extends Inventario
         $query->andFilterWhere(['p.unidad_medidaid' => $this->unidad_medidaid]);
         $query->andFilterWhere(['p.unidad_valor' => $this->unidad]);
         $query->andFilterWhere(['p.marcaid' => $this->marcaid]);
+        if(isset($params['global_param']) && !empty($params['global_param'])){
+            $query->andFilterWhere(['like','p.nombre',$params['global_param']]);
+        }
         
         //*******Custom Sort **********//
 
@@ -227,8 +230,7 @@ class InventarioSearch extends Inventario
                 $query->orderBy('cantidad ASC');
             }
         }
-        
-        
+
         if($this->defectuoso == 1 && $this->vencido == 'true'){
             $query->andWhere(['or',
                 ['defectuoso' => $this->defectuoso],

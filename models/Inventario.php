@@ -84,6 +84,7 @@ class Inventario extends BaseInventario
         if(!isset($param['defectuoso'])){
             throw new Exception('El atributo defectuoso es obligatorio');
         }
+        $cantidad = $param['cantidad'];
 
         $condicion['egresoid'] = null;
         $condicion['defectuoso'] = 0;

@@ -72,3 +72,13 @@
 ]
 */
 
+/*****Para crear****
+* @url http://api.inventario.local/api/localidads 
+* @method POST
+* @param arrayJson
+{
+	"nombre":"Milocali",
+	"departamentoid":1,
+	"codigo_postal":"8200"
+}
+**/

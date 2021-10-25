@@ -65,14 +65,36 @@ class LocalidadController extends ActiveController{
     {
         $resultado['estado']=false;
         $param = Yii::$app->request->queryParams;
-        $rio_negro = 16;
-        
-        $param=\yii\helpers\ArrayHelper::merge($param, ['provinciaid'=>$rio_negro]);
-        
+        $param['provinciaid'] = 16; // Rio negro
+        $param['extra'] = 1; // Seteamos el flags para injectar localidades extras
+        $param['pagesize'] = 5000; // Seteamos el flags para injectar localidades extras
+
         $resultado = \Yii::$app->lugar->buscarLocalidad($param);
         
         return $resultado['resultado'];
 
+    }
+
+    public function actionCreate(){
+        #Chequeamos el permiso
+        if (!\Yii::$app->user->can('localidad_crear')) {
+            throw new \yii\web\HttpException(403, 'No se tienen permisos necesarios para ejecutar esta acción');
+        }
+
+        $resultado['message']='Se registra una nueva localidad';
+        $param = Yii::$app->request->post();
+
+        $response = \Yii::$app->lugar->crearLocalidad($param);
+
+        if(isset($response['message'])){
+            throw new \yii\web\HttpException(400, $response['message']);
+        }
+
+        $resultado['success']=true;
+        $resultado['data']['id']=$response;
+
+        return $resultado;
+        
     }
     
     

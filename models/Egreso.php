@@ -120,7 +120,7 @@ class Egreso extends BaseEgreso
      * Se busca coleccion de item(productos) por fecha_vencimiento y productoid y seteamos la cantidad que egresa
      * @param array $item
      * @param int $cantidad
-     * @return type
+     * @return int
      */
     private function setEgreso($condicion, $cantidad) {
         // preparamos las pre-condiciones de stock //

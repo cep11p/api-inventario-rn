@@ -64,6 +64,27 @@ class Inventario extends BaseInventario
         
         return $comprobante->id;
     }
+
+    /**
+     * Nos permite realizar modificacion de stock de un comprobante
+     *
+     * @param [array] $param
+     * @return void
+     */
+    public function modificarStock($param) {
+        $comprobante = new \app\models\Comprobante();
+        
+        /**** Nuevo Comprobante *****/
+        $comprobante->setAttributesCustom($param);
+        if(!$comprobante->save()){
+            throw new Exception(json_encode($comprobante->getErrors()));
+        }
+        
+        /** Agregamos al stock un lista de productos **/
+        $this->agregarProductoAlStock($comprobante->id, $param);
+        
+        return $comprobante->id;
+    }
     
     /**
      * Vamos a setear los item que resultaron defectuosos. Por lo tanto debemos buscar los productos que cumplan la condicion de busqueda

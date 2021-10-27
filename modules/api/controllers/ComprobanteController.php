@@ -52,6 +52,7 @@ class ComprobanteController extends ActiveController{
         $actions = parent::actions();
         unset($actions['view']);
         unset($actions['update']);
+        unset($actions['create']);
 //        unset($actions['delete']);
         $actions['index']['prepareDataProvider'] = [$this, 'prepareDataProvider'];
         return $actions;
@@ -78,6 +79,34 @@ class ComprobanteController extends ActiveController{
         $resultado['lista_producto'] = $model->getListaProducto();
         
         return $resultado;
+    }
+
+    public function actionCreate(){
+        $param = Yii::$app->request->post();
+        
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            /**** Nuevo Comprobante *****/
+            $model = new Comprobante();
+            $model->setAttributesCustom($param);
+            if(!$model->save()){
+                throw new Exception(json_encode($model->getErrors()));
+            }
+            $cantidad = $model->registrarProductos($param);
+
+            $transaction->commit();
+            
+            $resultado['message']='Se guarda un nuevo stock';
+            $resultado['comprobanteid']=$this->id;
+            $resultado['cantidad']=$cantidad;
+            
+            return  $resultado;
+           
+        }catch (Exception $exc) {
+            $transaction->rollBack();
+            $mensaje =$exc->getMessage();
+            throw new \yii\web\HttpException(400, $mensaje);
+        }
     }
     
     public function actionUpdate($id) {

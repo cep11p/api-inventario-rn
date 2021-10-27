@@ -52,7 +52,7 @@ class InventarioController extends ActiveController{
     {
         $actions = parent::actions();
         unset($actions['create']);
-//        unset($actions['update']);
+        unset($actions['update']);
 //        unset($actions['delete']);
         $actions['index']['prepareDataProvider'] = [$this, 'prepareDataProvider'];
         return $actions;
@@ -67,29 +67,6 @@ class InventarioController extends ActiveController{
         return $resultado;
     }
     
-    public function actionCreate(){
-        $param = Yii::$app->request->post();
-        
-        $model = new Inventario();
-        $transaction = Yii::$app->db->beginTransaction();
-        try {
-            
-            $comprobanteid = $model->newStock($param);
-
-            $transaction->commit();
-            
-            $resultado['message']='Se guarda un nuevo stock';
-            $resultado['comprobanteid']=$comprobanteid;
-            
-            return  $resultado;
-           
-        }catch (Exception $exc) {
-            $transaction->rollBack();
-            $mensaje =$exc->getMessage();
-            throw new \yii\web\HttpException(400, $mensaje);
-        }
-    }
-
     /**
      * Esta accion permite realizar modificacion de ingresos. Se puede modificar dentro de 2 horas
      *
@@ -97,6 +74,7 @@ class InventarioController extends ActiveController{
      */
     public function actionUpdate($id){
         $param = Yii::$app->request->post();
+        $param['comprobanteid'] = $id;
         
         $transaction = Yii::$app->db->beginTransaction();
         try {

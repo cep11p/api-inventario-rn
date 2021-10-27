@@ -2,9 +2,9 @@
 
 namespace app\models;
 
-use Yii;
 use yii\base\Exception;
 use \app\models\base\Inventario as BaseInventario;
+use yii\db\Query;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -50,20 +50,6 @@ class Inventario extends BaseInventario
 
     }
     
-    public function newStock($param) {
-        $comprobante = new \app\models\Comprobante();
-        
-        /**** Nuevo Comprobante *****/
-        $comprobante->setAttributesCustom($param);
-        if(!$comprobante->save()){
-            throw new Exception(json_encode($comprobante->getErrors()));
-        }
-        
-        /** Agregamos al stock un lista de productos **/
-        $this->agregarProductoAlStock($comprobante->id, $param);
-        
-        return $comprobante->id;
-    }
 
     /**
      * Nos permite realizar modificacion de stock de un comprobante
@@ -72,8 +58,12 @@ class Inventario extends BaseInventario
      * @return void
      */
     public function modificarStock($param) {
-        $comprobante = new \app\models\Comprobante();
+        $comprobante = Comprobante::findOne(['id' => $param['comprobanteid']]);
         
+        if($comprobante == NULL){
+            throw new Exception('El comprobante a modificar no existe');
+        }
+
         /**** Nuevo Comprobante *****/
         $comprobante->setAttributesCustom($param);
         if(!$comprobante->save()){
@@ -81,7 +71,7 @@ class Inventario extends BaseInventario
         }
         
         /** Agregamos al stock un lista de productos **/
-        $this->agregarProductoAlStock($comprobante->id, $param);
+        $this->modificarProductoComprobante($comprobante->id, $param);
         
         return $comprobante->id;
     }
@@ -150,9 +140,15 @@ class Inventario extends BaseInventario
     }
     
     
-    
+    /**
+     * Vamos a registrar el nuevo stocl
+     *
+     * @param [int] $comprobanteid
+     * @param [array] $param
+     * @return int
+     */
     private function agregarProductoAlStock($comprobanteid, $param) {
-        
+        $new_stock = array();
         if(!isset($param['lista_producto']) || count($param['lista_producto'])<=0){
             throw new Exception('Falta lista de productos');
         }
@@ -165,16 +161,63 @@ class Inventario extends BaseInventario
             /** Guardamos un stock segun la cantidad de cada producto **/
             if(isset($producto['cantidad']) && $producto['cantidad']>0){
                 for($i = 1; $i <= $producto['cantidad']; $i++ ){
-                    $stock = new Inventario();
-                    $stock->setAttributes($producto);
-                    $stock->comprobanteid = $comprobanteid;
-                    $stock->productoid = $producto['id'];
-                    if(!$stock->save()){
-                        throw new Exception(json_encode($stock->getErrors()));
+                    $item = new Inventario();
+                    $item->setAttributes($producto);
+                    $item->comprobanteid = $comprobanteid;
+                    $item->productoid = $producto['id'];
+                    $item->falta = (!isset($producto['falta']) ||  $producto['falta'] != 1)?0:1;
+                    $item->defectuoso = (!isset($producto['defectuoso']) || $producto['defectuoso'] != 1)?0:1;
+                    if(!$item->validate()){
+                        throw new Exception(json_encode($item->getErrors()));
                     }
+
+                    $new_stock[] = $item->getAttributes();
                 }                    
             }
         }
+
+        #Creamos el sql para registros masivos
+        $query = new Query();
+        $resultado = $query->createCommand()->batchInsert('inventario', ['comprobanteid', 'productoid', 'fecha_vencimiento', 'precio_unitario', 'defectuoso', 'egresoid', 'depositoid', 'id', 'falta'], $new_stock)->execute();
+        
+        return $resultado;
+    }
+
+    /**
+     * Se modifican los productos de un comprobante
+     *
+     * @param [type] $comprobanteid
+     * @param [type] $param
+     * @return void
+     */
+    private function modificarProductoComprobante($comprobanteid, $param) {
+        print_r($param);die();
+
+        $new_stock = array();
+        if(!isset($param['lista_producto']) || count($param['lista_producto'])<=0){
+            throw new Exception('Falta lista de productos');
+        }
+        $item_ids = array();
+        foreach ($param['lista_producto'] as $item) {
+            if(!is_numeric($item['cantidad']) || intval($item['cantidad'])<=0){
+                throw new Exception('La cantidad debe ser un numero y mayor a 0');
+            }
+            
+            
+            $item_ids[] = $item['id'];
+        }
+        
+        #Pedimos la lista de items
+        $lista_item = Inventario::find()->where(['id' => $item_ids])->asArray()->all();
+        print_r($item_ids);die();
+
+
+
+        #Creamos el sql para registros masivos
+        // $query = new Query();
+        // $resultado = $query->createCommand()->batchInsert('inventario', ['comprobanteid', 'productoid', 'fecha_vencimiento', 'precio_unitario', 'defectuoso', 'egresoid', 'depositoid', 'id', 'falta'], $new_stock)->execute();
+        
+        // return $resultado;
     }
     
     /**

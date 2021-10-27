@@ -6,6 +6,7 @@ use Yii;
 use \app\models\base\Comprobante as BaseComprobante;
 use yii\helpers\ArrayHelper;
 use yii\base\Exception;
+use yii\db\Query;
 
 /**
  * This is the model class for table "comprobante".
@@ -31,6 +32,49 @@ class Comprobante extends BaseComprobante
                 # custom validation rules
             ]
         );
+    }
+
+    /**
+     * registramos un nuevo stock
+     *
+     * @param [array] $param
+     * @return array
+     */
+    public function registrarProductos($param) {
+        
+        $lista_producto = array();
+        if(!isset($param['lista_producto']) || count($param['lista_producto'])<=0){
+            throw new Exception('Falta lista de productos');
+        }
+        
+        foreach ($param['lista_producto'] as $producto) {
+            if(!is_numeric($producto['cantidad']) || intval($producto['cantidad'])<=0){
+                throw new Exception('La cantidad debe ser un numero y mayor a 0');
+            }
+
+            /** Guardamos un stock segun la cantidad de cada producto **/
+            if(isset($producto['cantidad']) && $producto['cantidad']>0){
+                for($i = 1; $i <= $producto['cantidad']; $i++ ){
+                    $item = new Inventario();
+                    $item->setAttributes($producto);
+                    $item->comprobanteid = $this->id;
+                    $item->productoid = $producto['id'];
+                    $item->falta = (!isset($producto['falta']) ||  $producto['falta'] != 1)?0:1;
+                    $item->defectuoso = (!isset($producto['defectuoso']) || $producto['defectuoso'] != 1)?0:1;
+                    if(!$item->validate()){
+                        throw new Exception(json_encode($item->getErrors()));
+                    }
+
+                    $lista_producto[] = $item->getAttributes();
+                }                    
+            }
+        }
+
+        #Creamos el sql para registros masivos
+        $query = new Query();
+        $resultado = $query->createCommand()->batchInsert('inventario', ['comprobanteid', 'productoid', 'fecha_vencimiento', 'precio_unitario', 'defectuoso', 'egresoid', 'depositoid', 'id', 'falta'], $lista_producto)->execute();
+        
+        return $resultado;
     }
     
     public function getListaProducto() {

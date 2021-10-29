@@ -18,11 +18,12 @@ use Yii;
  * @property integer $depositoid
  * @property integer $id
  * @property integer $falta
+ * @property integer $inactivo
  *
  * @property \app\models\Comprobante $comprobante
- * @property \app\models\Producto $producto
  * @property \app\models\Deposito $deposito
  * @property \app\models\Egreso $egreso
+ * @property \app\models\Producto $producto
  * @property string $aliasModel
  */
 abstract class Inventario extends \yii\db\ActiveRecord
@@ -45,13 +46,13 @@ abstract class Inventario extends \yii\db\ActiveRecord
     {
         return [
             [['comprobanteid', 'productoid'], 'required'],
-            [['comprobanteid', 'productoid', 'defectuoso', 'egresoid', 'depositoid', 'falta'], 'integer'],
+            [['comprobanteid', 'productoid', 'defectuoso', 'egresoid', 'depositoid', 'falta', 'inactivo'], 'integer'],
             [['fecha_vencimiento'], 'safe'],
             [['precio_unitario'], 'number'],
             [['comprobanteid'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\Comprobante::className(), 'targetAttribute' => ['comprobanteid' => 'id']],
             [['productoid'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\Producto::className(), 'targetAttribute' => ['productoid' => 'id']],
-            [['depositoid'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\Deposito::className(), 'targetAttribute' => ['depositoid' => 'id']],
-            [['egresoid'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\Egreso::className(), 'targetAttribute' => ['egresoid' => 'id']]
+            [['egresoid'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\Egreso::className(), 'targetAttribute' => ['egresoid' => 'id']],
+            [['depositoid'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\Deposito::className(), 'targetAttribute' => ['depositoid' => 'id']]
         ];
     }
 
@@ -70,6 +71,7 @@ abstract class Inventario extends \yii\db\ActiveRecord
             'depositoid' => 'Depositoid',
             'id' => 'ID',
             'falta' => 'Falta',
+            'inactivo' => 'Inactivo',
         ];
     }
 
@@ -79,14 +81,6 @@ abstract class Inventario extends \yii\db\ActiveRecord
     public function getComprobante()
     {
         return $this->hasOne(\app\models\Comprobante::className(), ['id' => 'comprobanteid']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getProducto()
-    {
-        return $this->hasOne(\app\models\Producto::className(), ['id' => 'productoid']);
     }
 
     /**
@@ -103,6 +97,14 @@ abstract class Inventario extends \yii\db\ActiveRecord
     public function getEgreso()
     {
         return $this->hasOne(\app\models\Egreso::className(), ['id' => 'egresoid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getProducto()
+    {
+        return $this->hasOne(\app\models\Producto::className(), ['id' => 'productoid']);
     }
 
 

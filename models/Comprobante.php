@@ -76,6 +76,63 @@ class Comprobante extends BaseComprobante
         
         return $resultado;
     }
+
+    /**
+     * Se modifican los productos de un comprobante
+     *
+     * @param [type] $comprobanteid
+     * @param [type] $param
+     * @return void
+     */
+    public function modificarProductos($param) {
+        // print_r($this->getListaProducto());die();
+        // print_r($param['lista_producto']);die();
+
+        if(!isset($param['lista_producto']) || count($param['lista_producto'])<=0){
+            throw new Exception('Falta lista de productos');
+        }
+
+        $lista_producto = $param['lista_producto'];
+        $productos_registrados = $this->getListaProducto();
+        $item_ids = array();
+        $i=0;
+        foreach ($lista_producto as $item) {
+            if(!is_numeric($item['cantidad']) || intval($item['cantidad'])<=0){
+                throw new Exception('La cantidad debe ser un numero y mayor a 0');
+            }
+
+            ##Comparamos con productos registrado
+            foreach ($productos_registrados as $prod) {
+                $item['falta'] = (!isset($item['falta']))?null:isset($item['falta']);
+                // print_r($item);die();
+                if( $prod['productoid']==$item['id'] && $prod['fecha_vencimiento']==$item['fecha_vencimiento'] && $prod['falta']==$item['falta']){
+
+                    #chequeamos si contamos o descontamos cantidad
+                    $cant = $item['cantidad'] - $prod['cantidad'];
+                    $item['cantidad'] = $cant;
+                    $lista_producto[$i] = $item;
+                }else{
+                    continue;
+                }
+            }
+            $i++;
+        }
+
+        print_r($lista_producto);
+        die();
+        
+        #Pedimos la lista de items
+        $lista_item = Inventario::find()->where(['id' => $item_ids])->asArray()->all();
+        print_r($item_ids);die();
+
+
+
+        #Creamos el sql para registros masivos
+        // $query = new Query();
+        // $resultado = $query->createCommand()->batchInsert('inventario', ['comprobanteid', 'productoid', 'fecha_vencimiento', 'precio_unitario', 'defectuoso', 'egresoid', 'depositoid', 'id', 'falta'], $new_stock)->execute();
+        
+        // return $resultado;
+    }
     
     public function getListaProducto() {
         $inventarioSearch = new InventarioSearch();

@@ -139,50 +139,6 @@ class Inventario extends BaseInventario
         return $ids;
     }
     
-    
-    /**
-     * Vamos a registrar el nuevo stocl
-     *
-     * @param [int] $comprobanteid
-     * @param [array] $param
-     * @return int
-     */
-    private function agregarProductoAlStock($comprobanteid, $param) {
-        $new_stock = array();
-        if(!isset($param['lista_producto']) || count($param['lista_producto'])<=0){
-            throw new Exception('Falta lista de productos');
-        }
-        
-        foreach ($param['lista_producto'] as $producto) {
-            if(!is_numeric($producto['cantidad']) || intval($producto['cantidad'])<=0){
-                throw new Exception('La cantidad debe ser un numero y mayor a 0');
-            }
-
-            /** Guardamos un stock segun la cantidad de cada producto **/
-            if(isset($producto['cantidad']) && $producto['cantidad']>0){
-                for($i = 1; $i <= $producto['cantidad']; $i++ ){
-                    $item = new Inventario();
-                    $item->setAttributes($producto);
-                    $item->comprobanteid = $comprobanteid;
-                    $item->productoid = $producto['id'];
-                    $item->falta = (!isset($producto['falta']) ||  $producto['falta'] != 1)?0:1;
-                    $item->defectuoso = (!isset($producto['defectuoso']) || $producto['defectuoso'] != 1)?0:1;
-                    if(!$item->validate()){
-                        throw new Exception(json_encode($item->getErrors()));
-                    }
-
-                    $new_stock[] = $item->getAttributes();
-                }                    
-            }
-        }
-
-        #Creamos el sql para registros masivos
-        $query = new Query();
-        $resultado = $query->createCommand()->batchInsert('inventario', ['comprobanteid', 'productoid', 'fecha_vencimiento', 'precio_unitario', 'defectuoso', 'egresoid', 'depositoid', 'id', 'falta'], $new_stock)->execute();
-        
-        return $resultado;
-    }
-
     /**
      * Se modifican los productos de un comprobante
      *

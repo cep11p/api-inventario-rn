@@ -110,6 +110,7 @@ class ComprobanteController extends ActiveController{
     }
     
     public function actionUpdate($id) {
+        $param = Yii::$app->request->post();
         $model = Comprobante::findOne(['id'=>$id]);
         
         if($model==null){
@@ -121,6 +122,8 @@ class ComprobanteController extends ActiveController{
             if(!$model->save()){
                 throw new Exception(json_encode($model->getErrors()));
             }
+
+            $model->modificarProductos($param);
 
             /** Agregamos al stock una nueva lista de productos **/
             $model->borrarListarProducto();

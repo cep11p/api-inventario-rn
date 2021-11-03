@@ -123,13 +123,12 @@ class ComprobanteController extends ActiveController{
                 throw new Exception(json_encode($model->getErrors()));
             }
 
-            $model->modificarProductos($param);
+            $resultado = $model->modificarProductos($param);
 
-            /** Agregamos al stock una nueva lista de productos **/
-            $model->borrarListarProducto();
-            $model->setListaProducto([]);
+            $transaction->commit();
         
-            return  $model->id;
+            $resultado['id'] = $model->id;
+            return $resultado;
            
         }catch (Exception $exc) {
             $transaction->rollBack();

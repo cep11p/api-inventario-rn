@@ -324,6 +324,7 @@ class InventarioSearch extends Inventario
         
         $query->andFilterWhere([
             'comprobanteid' => $this->comprobanteid,
+            'inactivo' => 0
         ]);
         
         $query->groupBy(['fecha_vencimiento','productoid','falta']);

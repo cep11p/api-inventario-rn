@@ -43,7 +43,8 @@ class Inventario extends BaseInventario
         if(isset($values['falta'])){
             $this->falta = \app\components\Help::booleanToInt($values['falta']);
         }
-        
+
+        //sacamos la fecha de vencimiento cuando el producto esta ausente
         if($this->falta == true){
             $this->fecha_vencimiento = null;
         }

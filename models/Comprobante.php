@@ -72,7 +72,7 @@ class Comprobante extends BaseComprobante
 
         #Creamos el sql para registros masivos
         $query = new Query();
-        $resultado = $query->createCommand()->batchInsert('inventario', ['comprobanteid', 'productoid', 'fecha_vencimiento', 'precio_unitario', 'defectuoso', 'egresoid', 'depositoid', 'id', 'falta'], $lista_producto)->execute();
+        $resultado = $query->createCommand()->batchInsert('inventario', ['comprobanteid', 'productoid', 'fecha_vencimiento', 'precio_unitario', 'defectuoso', 'egresoid', 'depositoid', 'id', 'falta','inactivo'], $lista_producto)->execute();
         
         return $resultado;
     }
@@ -85,53 +85,162 @@ class Comprobante extends BaseComprobante
      * @return void
      */
     public function modificarProductos($param) {
-        // print_r($this->getListaProducto());die();
-        // print_r($param['lista_producto']);die();
-
         if(!isset($param['lista_producto']) || count($param['lista_producto'])<=0){
             throw new Exception('Falta lista de productos');
         }
-
+        
         $lista_producto = $param['lista_producto'];
         $productos_registrados = $this->getListaProducto();
-        $item_ids = array();
+        $resultado = [];
+
+        #### Calculamos las cantidades a registrar y a borrar ####
         $i=0;
+        $lista_registrado_a_borrar = array();
         foreach ($lista_producto as $item) {
             if(!is_numeric($item['cantidad']) || intval($item['cantidad'])<=0){
-                throw new Exception('La cantidad debe ser un numero y mayor a 0');
+                throw new Exception('La cantidad debe ser un entero y mayor a 0');
             }
-
+            
             ##Comparamos con productos registrado
             foreach ($productos_registrados as $prod) {
                 $item['falta'] = (!isset($item['falta']))?null:isset($item['falta']);
-                // print_r($item);die();
                 if( $prod['productoid']==$item['id'] && $prod['fecha_vencimiento']==$item['fecha_vencimiento'] && $prod['falta']==$item['falta']){
-
+                    
                     #chequeamos si contamos o descontamos cantidad
                     $cant = $item['cantidad'] - $prod['cantidad'];
                     $item['cantidad'] = $cant;
                     $lista_producto[$i] = $item;
                 }else{
+                    $lista_registrado_a_borrar[] = $prod;
                     continue;
                 }
             }
             $i++;
         }
 
-        print_r($lista_producto);
-        die();
+        # seteamos inactivos los productos a borrrar
+        $this->setInactivoListaProductoRegistrados($lista_registrado_a_borrar);
+
+
+        #### Despues de calcular las cantidades especificas procedemos a la
+        #### reutlizacion de registros y/o agregado de registros nuevos     ####
+        $cant_inactivos_bd = count(Inventario::find()->where(['inactivo' => 1])->asArray()->all());
+        $cant_borrados = 0;
+        $cant_registrados = 0;
+        $cant_reutilizados = 0;
+        foreach ($lista_producto as $value) {
+            #Validamos el producto a registrar
+            $modelValidate = new Inventario();
+            $modelValidate->comprobanteid = $this->id;
+            #anulamos la fecha_vencimiento si falta producto
+            $modelValidate->fecha_vencimiento = (isset($value['falta']) &&  $value['falta'] == 1)?NULL:$value['fecha_vencimiento'];
+            $modelValidate->productoid = $value['id'];
+            $modelValidate->falta = (!isset($value['falta']) ||  $value['falta'] != 1)?0:1;
+            if(!$modelValidate->validate()){
+                throw new Exception(json_encode($modelValidate->getErrors()));
+            }
+
+            $query = new Query();
+            #Se inactivan registros si cantidad es negativo
+            if($value['cantidad']<0){ // se borran registros
+                
+                //necesitamos la cantidad a borrar en numero positvo
+                $limit = $value['cantidad'] * -1;
+                
+                $lista_ids = Inventario::find()->select('id')->where([
+                    'comprobanteid' => $this->id,
+                    'productoid' => $value['id'], 
+                    'fecha_vencimiento' => $value['fecha_vencimiento']
+                    ])->limit($limit)->asArray()->all();
+                    
+                $resul = Inventario::updateAll(['inactivo'=>1],['id' => $lista_ids]);
+                
+                $cant_borrados = $cant_borrados+$resul;
+
+            #Nuevos registros
+            }elseif($value['cantidad']>0){
+                
+                #calculamos la cantidad de registros reutilizables
+                $productos_inactivos = Inventario::find()->select(['id'])->where(['inactivo' => 1])->asArray()->all();
+
+                #### Reutilizamos registros ####
+                if(count($productos_inactivos)>$value['cantidad']){        
+                    
+                    #procedemos a reutilizar registros
+                    $limit_reutilizables_ids = Inventario::find()->select(['id'])->where(['inactivo' => 1])->limit($value['cantidad'])->asArray()->all();
+                    Inventario::updateAll([
+                        'fecha_vencimiento'=>(isset($value['falta']) &&  $value['falta'] == 1)?NULL:$value['fecha_vencimiento'],
+                        'comprobanteid' => $this->id,
+                        'productoid' => $value['id'],
+                        'falta' => (!isset($value['falta']) ||  $value['falta'] != 1)?0:1,
+                        'defectuoso' => (!isset($value['defectuoso']) || $value['defectuoso'] != 1)?0:1,
+                        'inactivo' => 0
+                    ],
+                    ['id' => $limit_reutilizables_ids]);
+                    
+                #### Si los registros reutilizables no bastan
+                }else{
+                    #cantidad reutilizables
+                    $cant_reutil = count($productos_inactivos);
+                    
+                    #si la cantidad reutilizable es mayor a 0, reutilizamos lo que podemos sin problema
+                    if($cant_reutil>0){
+                        #Sacamos la cantidad que se puede reutilzar
+                        $limit_reutilizables_ids = Inventario::find()->select(['id'])->where(['inactivo' => 1])->limit($cant_reutil)->asArray()->all();
+                      
+                        #obtenemos el resto para ser registrados
+                        $value['cantidad'] = $value['cantidad'] - count($limit_reutilizables_ids);
+                        
+                        #realizamos la consulta
+                        $cant_reutilizados = $cant_reutilizados + Inventario::updateAll([
+                            'fecha_vencimiento'=>(isset($value['falta']) &&  $value['falta'] == 1)?NULL:$value['fecha_vencimiento'],
+                            'comprobanteid' => $this->id,
+                            'productoid' => $value['id'],
+                            'falta' => (!isset($value['falta']) ||  $value['falta'] != 1)?0:1,
+                            'defectuoso' => (!isset($value['defectuoso']) || $value['defectuoso'] != 1)?0:1,
+                            'inactivo' => 0
+                        ],
+                        ['id' => $limit_reutilizables_ids]);
+
+                    }
+                    
+                    #Registramos los items restantes
+                    if($value['cantidad']>0){
+                        for ($i=0; $i < $value['cantidad']; $i++) { 
+                            $resul = $query->createCommand()->insert('inventario', [
+                                'fecha_vencimiento'=>(isset($value['falta']) &&  $value['falta'] == 1)?NULL:$value['fecha_vencimiento'],
+                                'comprobanteid' => $this->id,
+                                'productoid' => $value['id'],
+                                'falta' => (!isset($value['falta']) ||  $value['falta'] != 1)?0:1,
+                                'defectuoso' => (!isset($value['defectuoso']) || $value['defectuoso'] != 1)?0:1,
+                            ])->execute();
+                            $cant_registrados = $cant_registrados + $resul;
+                        }
+                    }
+                }
+            }
+
+        }
+        $resultado['reutilizados'] = $cant_reutilizados;
+        $resultado['registrados'] = $cant_registrados;
+        $resultado['inactivos'] = $cant_borrados;
+        $resultado['inactivos_bd'] = $cant_inactivos_bd;
         
-        #Pedimos la lista de items
-        $lista_item = Inventario::find()->where(['id' => $item_ids])->asArray()->all();
-        print_r($item_ids);die();
+        return $resultado;
+    }
 
+    public function setInactivoListaProductoRegistrados($params){
+        $resultado = 0;
+        foreach ($params as $value) {
+            $lista_ids = Inventario::find()->select('id')->where([
+                'comprobanteid' => $this->id,
+                'productoid' => $value['productoid'], 
+                'fecha_vencimiento' => $value['fecha_vencimiento']
+                ])->asArray()->all();            
+            $resultado = $resultado + Inventario::updateAll(['inactivo'=>1],['id' => $lista_ids]);               
+        }
 
-
-        #Creamos el sql para registros masivos
-        // $query = new Query();
-        // $resultado = $query->createCommand()->batchInsert('inventario', ['comprobanteid', 'productoid', 'fecha_vencimiento', 'precio_unitario', 'defectuoso', 'egresoid', 'depositoid', 'id', 'falta'], $new_stock)->execute();
-        
-        // return $resultado;
+        return $resultado;
     }
     
     public function getListaProducto() {

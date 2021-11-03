@@ -11,14 +11,14 @@ use Yii;
  *
  * @property integer $id
  * @property string $nro_remito
- * @property string $fecha_inicial
  * @property string $fecha_emision
  * @property double $total
  * @property integer $proveedorid
  * @property string $descripcion
+ * @property string $create_at
  *
- * @property \app\models\Proveedor $proveedor
  * @property \app\models\Inventario[] $inventarios
+ * @property \app\models\Proveedor $proveedor
  * @property string $aliasModel
  */
 abstract class Comprobante extends \yii\db\ActiveRecord
@@ -40,8 +40,8 @@ abstract class Comprobante extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['nro_remito', 'fecha_inicial', 'fecha_emision'], 'required'],
-            [['fecha_inicial', 'fecha_emision'], 'safe'],
+            [['nro_remito', 'fecha_emision'], 'required'],
+            [['fecha_emision', 'create_at'], 'safe'],
             [['total'], 'number'],
             [['proveedorid'], 'integer'],
             [['descripcion'], 'string'],
@@ -59,11 +59,11 @@ abstract class Comprobante extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'nro_remito' => 'Nro Remito',
-            'fecha_inicial' => 'Fecha Inicial',
             'fecha_emision' => 'Fecha Emision',
             'total' => 'Total',
             'proveedorid' => 'Proveedorid',
             'descripcion' => 'Descripcion',
+            'create_at' => 'Create At',
         ];
     }
 
@@ -73,8 +73,6 @@ abstract class Comprobante extends \yii\db\ActiveRecord
     public function attributeHints()
     {
         return array_merge(parent::attributeHints(), [
-            'fecha_inicial' => 'Fecha de registro en el servidor
-',
             'fecha_emision' => 'fecha que se emite el comprobate
 ',
         ]);
@@ -83,17 +81,17 @@ abstract class Comprobante extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getProveedor()
+    public function getInventarios()
     {
-        return $this->hasOne(\app\models\Proveedor::className(), ['id' => 'proveedorid']);
+        return $this->hasMany(\app\models\Inventario::className(), ['comprobanteid' => 'id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getInventarios()
+    public function getProveedor()
     {
-        return $this->hasMany(\app\models\Inventario::className(), ['comprobanteid' => 'id']);
+        return $this->hasOne(\app\models\Proveedor::className(), ['id' => 'proveedorid']);
     }
 
 

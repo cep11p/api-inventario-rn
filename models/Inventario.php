@@ -36,6 +36,11 @@ class Inventario extends BaseInventario
     
     public function setAttributes($values, $safeOnly = true) {
         parent::setAttributes($values, $safeOnly);
+
+        #Fecha Vencimiento
+        if(isset($values['fecha_vencimiento'])){
+            $this->fecha_vencimiento = (empty($values['fecha_vencimiento'])) ? NULL : $values['fecha_vencimiento'];
+        }
         
         if(isset($values['defectuoso'])){
             $this->defectuoso = \app\components\Help::booleanToInt($values['defectuoso']);

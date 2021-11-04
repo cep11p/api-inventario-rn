@@ -92,13 +92,12 @@ class ComprobanteController extends ActiveController{
             if(!$model->save()){
                 throw new Exception(json_encode($model->getErrors()));
             }
-            $cantidad = $model->registrarProductos($param);
+            $model->registrarProductos($param);
 
             $transaction->commit();
             
             $resultado['message']='Se guarda un nuevo stock';
-            $resultado['comprobanteid']=$this->id;
-            $resultado['cantidad']=$cantidad;
+            $resultado['comprobanteid']=$model->id;
             
             return  $resultado;
            

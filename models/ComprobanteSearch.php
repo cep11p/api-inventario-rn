@@ -78,6 +78,9 @@ class ComprobanteSearch extends Comprobante
         $coleccion = array();
         foreach ($dataProvider->getModels() as $value) {
             $item = $value->toArray();
+            $limit_time = date('d-m-Y H:m:i',strtotime($item['create_at'].' +3 hour'));
+            $item['editable'] = (date('d-m-y H:m:d') < $limit_time)?false:true;
+
             $coleccion[] = $item;
         }
 

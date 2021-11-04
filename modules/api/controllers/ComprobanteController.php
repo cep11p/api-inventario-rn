@@ -118,12 +118,13 @@ class ComprobanteController extends ActiveController{
         }
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            
+            $model->setScenario('update');
+            $model->setAttributes($param);            
             if(!$model->save()){
                 throw new Exception(json_encode($model->getErrors()));
             }
 
-            $resultado = $model->modificarProductos($param);
+            $model->modificarProductos($param);
 
             $transaction->commit();
         

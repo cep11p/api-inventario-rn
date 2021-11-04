@@ -22,7 +22,8 @@
         {
             "id": 1,
             "nro_remito": "0001-00001",
-            "fecha_inicial": "2019-03-03",
+            "editable": false
+            "create_at": "2021-10-27 12:51:40",
             "fecha_emision": "2019-03-03",
             "total": 7500,
             "proveedorid": 1,
@@ -37,7 +38,8 @@
         {
             "id": 2,
             "nro_remito": "0001-00002",
-            "fecha_inicial": "2019-04-03",
+            "editable": true
+            "create_at": "2021-10-27 12:51:40",
             "fecha_emision": "2019-04-03",
             "total": 2099.99,
             "proveedorid": 1,
@@ -55,7 +57,8 @@
         {
             "id": 9,
             "nro_remito": "0001-00009",
-            "fecha_inicial": "2019-04-03",
+            "editable": true
+            "create_at": "2021-10-27 12:51:40",
             "fecha_emision": "2019-04-03",
             "total": 7500,
             "proveedorid": "",

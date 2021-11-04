@@ -30,8 +30,16 @@ class Comprobante extends BaseComprobante
             parent::rules(),
             [
                 # custom validation rules
+                [['create_at'],'permitirModificado','on' => 'update']
             ]
         );
+    }
+
+    public function permitirModificado(){
+        $limit_time = date('d-m-Y H:m:i',strtotime($this->create_at.' +3 hour'));
+        if(date('d-m-y H:m:d') < $limit_time){
+            throw new Exception('No se puede editar comprobante despues de 3 horas de su creacion');
+        }
     }
 
     /**
@@ -134,7 +142,7 @@ class Comprobante extends BaseComprobante
             $modelValidate->comprobanteid = $this->id;
             #anulamos la fecha_vencimiento si falta producto
             $modelValidate->fecha_vencimiento = (isset($value['falta']) &&  $value['falta'] == 1)?NULL:$value['fecha_vencimiento'];
-            $modelValidate->productoid = $value['id'];
+            $modelValidate->productoid = $value['productoid'];
             $modelValidate->falta = (!isset($value['falta']) ||  $value['falta'] != 1)?0:1;
             if(!$modelValidate->validate()){
                 throw new Exception(json_encode($modelValidate->getErrors()));

@@ -58,7 +58,7 @@ class Comprobante extends BaseComprobante
                     $item = new Inventario();
                     $item->setAttributes($producto);
                     $item->comprobanteid = $this->id;
-                    $item->productoid = $producto['id'];
+                    $item->productoid = $producto['productoid'];
                     $item->falta = (!isset($producto['falta']) ||  $producto['falta'] != 1)?0:1;
                     $item->defectuoso = (!isset($producto['defectuoso']) || $producto['defectuoso'] != 1)?0:1;
                     if(!$item->validate()){
@@ -261,7 +261,6 @@ class Comprobante extends BaseComprobante
     
     public function setAttributesCustom($values, $safeOnly = true) {
         parent::setAttributes($values, $safeOnly);
-        $this->fecha_inicial = date('Y-m-d');
     }
     
     public function borrarListaProducto() {

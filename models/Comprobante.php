@@ -104,7 +104,7 @@ class Comprobante extends BaseComprobante
             ##Comparamos con productos registrado
             foreach ($productos_registrados as $prod) {
                 $item['falta'] = (!isset($item['falta']))?null:isset($item['falta']);
-                if( $prod['productoid']==$item['id'] && $prod['fecha_vencimiento']==$item['fecha_vencimiento'] && $prod['falta']==$item['falta']){
+                if( $prod['productoid']==$item['productoid'] && $prod['fecha_vencimiento']==$item['fecha_vencimiento'] && $prod['falta']==$item['falta']){
                     
                     #chequeamos si contamos o descontamos cantidad
                     $cant = $item['cantidad'] - $prod['cantidad'];
@@ -149,7 +149,7 @@ class Comprobante extends BaseComprobante
                 
                 $lista_ids = Inventario::find()->select('id')->where([
                     'comprobanteid' => $this->id,
-                    'productoid' => $value['id'], 
+                    'productoid' => $value['productoid'], 
                     'fecha_vencimiento' => $value['fecha_vencimiento']
                     ])->limit($limit)->asArray()->all();
                     
@@ -171,7 +171,7 @@ class Comprobante extends BaseComprobante
                     Inventario::updateAll([
                         'fecha_vencimiento'=>(isset($value['falta']) &&  $value['falta'] == 1)?NULL:$value['fecha_vencimiento'],
                         'comprobanteid' => $this->id,
-                        'productoid' => $value['id'],
+                        'productoid' => $value['productoid'],
                         'falta' => (!isset($value['falta']) ||  $value['falta'] != 1)?0:1,
                         'defectuoso' => (!isset($value['defectuoso']) || $value['defectuoso'] != 1)?0:1,
                         'inactivo' => 0
@@ -195,7 +195,7 @@ class Comprobante extends BaseComprobante
                         $cant_reutilizados = $cant_reutilizados + Inventario::updateAll([
                             'fecha_vencimiento'=>(isset($value['falta']) &&  $value['falta'] == 1)?NULL:$value['fecha_vencimiento'],
                             'comprobanteid' => $this->id,
-                            'productoid' => $value['id'],
+                            'productoid' => $value['productoid'],
                             'falta' => (!isset($value['falta']) ||  $value['falta'] != 1)?0:1,
                             'defectuoso' => (!isset($value['defectuoso']) || $value['defectuoso'] != 1)?0:1,
                             'inactivo' => 0
@@ -210,7 +210,7 @@ class Comprobante extends BaseComprobante
                             $resul = $query->createCommand()->insert('inventario', [
                                 'fecha_vencimiento'=>(isset($value['falta']) &&  $value['falta'] == 1)?NULL:$value['fecha_vencimiento'],
                                 'comprobanteid' => $this->id,
-                                'productoid' => $value['id'],
+                                'productoid' => $value['productoid'],
                                 'falta' => (!isset($value['falta']) ||  $value['falta'] != 1)?0:1,
                                 'defectuoso' => (!isset($value['defectuoso']) || $value['defectuoso'] != 1)?0:1,
                             ])->execute();

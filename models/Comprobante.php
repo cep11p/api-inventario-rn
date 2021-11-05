@@ -42,6 +42,77 @@ class Comprobante extends BaseComprobante
         }
     }
 
+    #Registramos los items reutilizando los registros que se puedan
+    private function reutilizarRegistros($producto){
+        
+        $query = new Query();
+
+        #set fecha_vencimiento
+        $fecha_vencimiento = (isset($value['fecha_vencimiento']) && empty($value['fecha_vencimiento'])) ? $value['fecha_vencimiento'] : NULL;
+
+        #calculamos la cantidad de registros reutilizables
+        $productos_inactivos = Inventario::find()->select(['id'])->where(['inactivo' => 1])->asArray()->all();
+        
+        #### Reutilizamos registros ####
+        if(count($productos_inactivos)>$producto['cantidad']){
+            
+           #procedemos a reutilizar registros
+            $limit_reutilizables_ids = Inventario::find()->select(['id'])->where(['inactivo' => 1])->limit($producto['cantidad'])->asArray()->all();
+            
+            Inventario::updateAll([
+                'fecha_vencimiento'=>(isset($producto['falta']) &&  $producto['falta'] == 1)?NULL:$fecha_vencimiento,
+                'comprobanteid' => $this->id,
+                'productoid' => $producto['productoid'],
+                'falta' => (!isset($producto['falta']) ||  $producto['falta'] != 1)?0:1,
+                'defectuoso' => (!isset($producto['defectuoso']) || $producto['defectuoso'] != 1)?0:1,
+                'inactivo' => 0
+            ],
+            ['id' => $limit_reutilizables_ids]);
+            
+            #### Si los registros reutilizables no bastan
+        }else{
+            #cantidad reutilizables
+            $cant_reutil = count($productos_inactivos);
+            
+            #si la cantidad reutilizable es mayor a 0, reutilizamos lo que podemos sin problema
+            if($cant_reutil>0){
+                #Sacamos la cantidad que se puede reutilzar
+                $limit_reutilizables_ids = Inventario::find()->select(['id'])->where(['inactivo' => 1])->limit($cant_reutil)->asArray()->all();
+                
+                #obtenemos el resto para ser registrados
+                $producto['cantidad'] = $producto['cantidad'] - count($limit_reutilizables_ids);
+                
+                #realizamos la consulta
+                Inventario::updateAll([
+                    'fecha_vencimiento'=>(isset($producto['falta']) &&  $producto['falta'] == 1)?NULL:$fecha_vencimiento,
+                    'comprobanteid' => $this->id,
+                    'productoid' => $producto['productoid'],
+                    'falta' => (!isset($producto['falta']) ||  $producto['falta'] != 1)?0:1,
+                    'defectuoso' => (!isset($producto['defectuoso']) || $producto['defectuoso'] != 1)?0:1,
+                    'inactivo' => 0
+                ],
+                ['id' => $limit_reutilizables_ids]);
+                
+            }
+            
+            $resultado = array();
+            #Registramos los items restantes
+            if($producto['cantidad']>0){
+                for ($i=0; $i < $producto['cantidad']; $i++) { 
+
+                    $resultado[] = $query->createCommand()->insert('inventario', [
+                        'fecha_vencimiento'=>(isset($producto['falta']) &&  $producto['falta'] == 1)?NULL:$fecha_vencimiento,
+                        'comprobanteid' => $this->id,
+                        'productoid' => $producto['productoid'],
+                        'falta' => (!isset($producto['falta']) ||  $producto['falta'] != 1)?0:1,
+                        'defectuoso' => (!isset($producto['defectuoso']) || $producto['defectuoso'] != 1)?0:1,
+                    ])->execute();
+                }
+            }
+        }
+        
+    }
+
     /**
      * registramos un nuevo stock
      *
@@ -53,74 +124,42 @@ class Comprobante extends BaseComprobante
         if(!isset($param['lista_producto']) || count($param['lista_producto'])<=0){
             throw new Exception('Falta lista de productos');
         }
-        
+
+        #validamos la lista de productos
+        $this->validarListaItems($param['lista_producto']);
+
+        #recorremos la lista de productos
         $query = new Query();
         foreach ($param['lista_producto'] as $producto) {
             if(!is_numeric($producto['cantidad']) || intval($producto['cantidad'])<=0){
                 throw new Exception('La cantidad debe ser un numero y mayor a 0');
             }
+            $this->reutilizarRegistros($producto);
+        }
+    }
 
-            #Registramos los items reutilizando los registros que se puedan
-            #calculamos la cantidad de registros reutilizables
-            $productos_inactivos = Inventario::find()->select(['id'])->where(['inactivo' => 1])->asArray()->all();
 
-            #### Reutilizamos registros ####
-            if(count($productos_inactivos)>$producto['cantidad']){
-                
-                #set fecha_vencimiento
-                $fecha_vencimiento = (isset($producto['fecha_vencimiento']) && empty($producto['fecha_vencimiento'])) ? NULL : $producto['fecha_vencimiento'];
+    /**
+     * Se valida la lista de producto que se quiere ingresar
+     *
+     * @param [array] $lista_items
+     * @return void
+     */
+    private function validarListaItems($lista_producto){
 
-                #procedemos a reutilizar registros
-                $limit_reutilizables_ids = Inventario::find()->select(['id'])->where(['inactivo' => 1])->limit($producto['cantidad'])->asArray()->all();
-                
-                Inventario::updateAll([
-                    'fecha_vencimiento'=>(isset($producto['falta']) &&  $producto['falta'] == 1)?NULL:$fecha_vencimiento,
-                    'comprobanteid' => $this->id,
-                    'productoid' => $producto['productoid'],
-                    'falta' => (!isset($producto['falta']) ||  $producto['falta'] != 1)?0:1,
-                    'defectuoso' => (!isset($producto['defectuoso']) || $producto['defectuoso'] != 1)?0:1,
-                    'inactivo' => 0
-                ],
-                ['id' => $limit_reutilizables_ids]);
-                
-            #### Si los registros reutilizables no bastan
-            }else{
-                #cantidad reutilizables
-                $cant_reutil = count($productos_inactivos);
-                
-                #si la cantidad reutilizable es mayor a 0, reutilizamos lo que podemos sin problema
-                if($cant_reutil>0){
-                    #Sacamos la cantidad que se puede reutilzar
-                    $limit_reutilizables_ids = Inventario::find()->select(['id'])->where(['inactivo' => 1])->limit($cant_reutil)->asArray()->all();
-                  
-                    #obtenemos el resto para ser registrados
-                    $producto['cantidad'] = $producto['cantidad'] - count($limit_reutilizables_ids);
-                    
-                    #realizamos la consulta
-                    Inventario::updateAll([
-                        'fecha_vencimiento'=>(isset($producto['falta']) &&  $producto['falta'] == 1)?NULL:$producto['fecha_vencimiento'],
-                        'comprobanteid' => $this->id,
-                        'productoid' => $producto['productoid'],
-                        'falta' => (!isset($producto['falta']) ||  $producto['falta'] != 1)?0:1,
-                        'defectuoso' => (!isset($producto['defectuoso']) || $producto['defectuoso'] != 1)?0:1,
-                        'inactivo' => 0
-                    ],
-                    ['id' => $limit_reutilizables_ids]);
+        foreach ($lista_producto as $value) {
+            $fecha_vencimiento = (isset($value['fecha_vencimiento']) && empty($value['fecha_vencimiento'])) ? $value['fecha_vencimiento'] : NULL;
 
-                }
-                
-                #Registramos los items restantes
-                if($producto['cantidad']>0){
-                    for ($i=0; $i < $producto['cantidad']; $i++) { 
-                        $query->createCommand()->insert('inventario', [
-                            'fecha_vencimiento'=>(isset($producto['falta']) &&  $producto['falta'] == 1)?NULL:$producto['fecha_vencimiento'],
-                            'comprobanteid' => $this->id,
-                            'productoid' => $producto['productoid'],
-                            'falta' => (!isset($producto['falta']) ||  $producto['falta'] != 1)?0:1,
-                            'defectuoso' => (!isset($producto['defectuoso']) || $producto['defectuoso'] != 1)?0:1,
-                        ])->execute();
-                    }
-                }
+            #Validamos el producto a registrar
+            $modelValidate = new Inventario();
+            $modelValidate->comprobanteid = $this->id;
+            #anulamos la fecha_vencimiento si falta producto
+            $modelValidate->fecha_vencimiento = (isset($value['falta']) &&  $value['falta'] == 1)?NULL:$fecha_vencimiento;
+            $modelValidate->productoid = $value['productoid'];
+            $modelValidate->falta = (!isset($value['falta']) ||  $value['falta'] != 1)?0:1;
+
+            if(!$modelValidate->validate()){
+                throw new Exception(json_encode($modelValidate->getErrors()));
             }
         }
     }

@@ -68,8 +68,7 @@ class Comprobante extends BaseComprobante
             Inventario::updateAll(['inactivo'=>1],['id' => $lista_ids]);
             
         #Nuevos registros
-        }elseif($producto['cantidad']>0){
-        
+        }elseif($producto['cantidad']>=0){
             #### Reutilizamos registros ####
             if(count($productos_inactivos)>$producto['cantidad']){
                 
@@ -145,7 +144,6 @@ class Comprobante extends BaseComprobante
         $this->validarListaItems($param['lista_producto']);
 
         #recorremos la lista de productos
-        $query = new Query();
         foreach ($param['lista_producto'] as $producto) {
             if($modificar == false && (!is_numeric($producto['cantidad']) || intval($producto['cantidad'])<=0)){
                 throw new Exception('La cantidad debe ser un numero y mayor a 0');
@@ -194,8 +192,7 @@ class Comprobante extends BaseComprobante
         
         $lista_producto = $param['lista_producto'];
         $productos_registrados = $this->getListaProducto();
-        // echo "nueva lista: ";print_r($lista_producto);
-        // echo "\n productos registrado: ";
+
         // print_r($productos_registrados);die();
         $resultado = [];
 
@@ -207,27 +204,25 @@ class Comprobante extends BaseComprobante
             }
             
             ##Comparamos con productos registrado
-            $j=0;
-            foreach ($productos_registrados as $prod) {
-                $item['falta'] = (!isset($item['falta']))?null:isset($item['falta']);
-                $fecha_vencimiento = (isset($prod['fecha_vencimiento']) && !empty($prod['fecha_vencimiento'])) ? $prod['fecha_vencimiento'] : NULL;
+            foreach ($productos_registrados as $key => $prod) {
+                $item['falta'] = (!isset($item['falta']))?0:isset($item['falta']);
+                $fecha_vencimiento = (isset($item['fecha_vencimiento']) && !empty($item['fecha_vencimiento'])) ? $item['fecha_vencimiento'] : NULL;
 
                 
                 if( $prod['productoid']==$item['productoid'] && $prod['fecha_vencimiento']==$fecha_vencimiento && $prod['falta']==$item['falta']){
                     
-                    #Se descarta los productos a registrar o a modificar
-                    unset($productos_registrados[$j]);
                     
                     #chequeamos si contamos o descontamos cantidad
                     $cant = $item['cantidad'] - $prod['cantidad'];
                     $item['cantidad'] = $cant;
                     $lista_producto[$i] = $item;
+                    
+                    #Se descarta los productos a registrar o a modificar
+                    unset($productos_registrados[$key]);
                 }
-                $j++;
             }
             $i++;
         }
-        // print_r($lista_producto);die();
         
         $param['lista_producto'] = $lista_producto;
         # seteamos inactivos los productos a borrrar

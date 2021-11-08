@@ -25,7 +25,7 @@ class InventarioSearch extends Inventario
     public function rules()
     {
         return [
-            [['comprobanteid', 'productoid', 'defectuoso', 'egresoid', 'depositoid', 'id', 'falta','categoriaid','unidad_medidaid','unidad','marcaid'], 'integer'],
+            [['comprobanteid', 'productoid', 'defectuoso', 'egresoid', 'depositoid', 'id', 'falta','categoriaid','unidad_medidaid','unidad','marcaid','inactivo'], 'integer'],
             [['fecha_vencimiento','cantidad','vencido','por_vencer'], 'safe'],
             [['precio_unitario'], 'number'],
         ];
@@ -324,7 +324,7 @@ class InventarioSearch extends Inventario
         
         $query->andFilterWhere([
             'comprobanteid' => $this->comprobanteid,
-            'inactivo' => 0
+            'inactivo' => $this->inactivo
         ]);
         
         $query->groupBy(['fecha_vencimiento','productoid','falta']);
@@ -480,7 +480,8 @@ class InventarioSearch extends Inventario
             'id' => $this->id,
             'comprobanteid' => $this->comprobanteid,
             'depositoid' => $this->depositoid,
-            'egresoid' => $this->egresoid
+            'egresoid' => $this->egresoid,
+            'inactivo' => $this->inactivo
         ]);
         
         $rows = $query->createCommand()->queryAll();

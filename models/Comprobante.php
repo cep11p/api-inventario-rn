@@ -36,8 +36,8 @@ class Comprobante extends BaseComprobante
     }
 
     public function permitirModificado(){
-        $limit_time = date('d-m-Y H:m:i',strtotime($this->create_at.' +3 hour'));
-        if(date('d-m-y H:m:d') < $limit_time){
+        $limit_time = date('Y-m-d H:i:s',strtotime($this->create_at.' +3 hour'));
+        if(date('Y-m-d H:i:s') > $limit_time){
             throw new Exception('No se puede editar comprobante despues de 3 horas de su creacion');
         }
     }

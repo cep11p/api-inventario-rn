@@ -72,6 +72,10 @@ $config = [
             'showScriptName' => false,
             'enableStrictParsing' => false,
             'rules' => [
+                [   #Permiso
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'api/permiso', 
+                ],
                 [   
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'api/categoria'

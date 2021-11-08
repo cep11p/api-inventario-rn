@@ -46,9 +46,9 @@ class Comprobante extends BaseComprobante
     private function reutilizarRegistros($producto){
         
         $query = new Query();
-
+        
         #set fecha_vencimiento
-        $fecha_vencimiento = (isset($value['fecha_vencimiento']) && empty($value['fecha_vencimiento'])) ? $value['fecha_vencimiento'] : NULL;
+        $fecha_vencimiento = (isset($producto['fecha_vencimiento']) && !empty($producto['fecha_vencimiento'])) ? $producto['fecha_vencimiento'] : NULL;
 
         #calculamos la cantidad de registros reutilizables
         $productos_inactivos = Inventario::find()->select(['id'])->where(['inactivo' => 1])->asArray()->all();
@@ -75,7 +75,6 @@ class Comprobante extends BaseComprobante
                 
             #procedemos a reutilizar registros
                 $limit_reutilizables_ids = Inventario::find()->select(['id'])->where(['inactivo' => 1])->limit($producto['cantidad'])->asArray()->all();
-                
                 Inventario::updateAll([
                     'fecha_vencimiento'=>(isset($producto['falta']) &&  $producto['falta'] == 1)?NULL:$fecha_vencimiento,
                     'comprobanteid' => $this->id,
@@ -116,7 +115,7 @@ class Comprobante extends BaseComprobante
                 #Registramos los items restantes
                 if($producto['cantidad']>0){
                     for ($i=0; $i < $producto['cantidad']; $i++) { 
-
+                        
                         $resultado[] = $query->createCommand()->insert('inventario', [
                             'fecha_vencimiento'=>(isset($producto['falta']) &&  $producto['falta'] == 1)?NULL:$fecha_vencimiento,
                             'comprobanteid' => $this->id,

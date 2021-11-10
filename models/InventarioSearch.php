@@ -26,7 +26,7 @@ class InventarioSearch extends Inventario
     {
         return [
             [['comprobanteid', 'productoid', 'defectuoso', 'egresoid', 'depositoid', 'id', 'falta','categoriaid','unidad_medidaid','unidad','marcaid','inactivo'], 'integer'],
-            [['fecha_vencimiento','cantidad','vencido','por_vencer'], 'safe'],
+            [['fecha_vencimiento','cantidad','vencido','por_vencer','approved_at'], 'safe'],
             [['precio_unitario'], 'number'],
         ];
     }
@@ -193,8 +193,7 @@ class InventarioSearch extends Inventario
             'id' => $this->id,
             'productoid' => $this->productoid,
             'fecha_vencimiento' => $this->fecha_vencimiento,
-            'depositoid' => $this->depositoid,
-            'falta' => 0
+            'depositoid' => $this->depositoid
         ]);
         
         //Join con Producto
@@ -231,15 +230,19 @@ class InventarioSearch extends Inventario
             }
         }
 
+        #Defectuoso y Vencido
         if($this->defectuoso == 1 && $this->vencido == 'true'){
             $query->andWhere(['or',
                 ['defectuoso' => $this->defectuoso],
                 ['<=','fecha_vencimiento', date('Y-m-d')]
             ]);
+        #Defectuoso
         }else if($this->defectuoso == 1){
             $query->andWhere(['defectuoso' => $this->defectuoso]);
+        #Vencido
         }else if($this->vencido == 'true'){
             $query->andWhere(['<=','fecha_vencimiento', date('Y-m-d')]);
+        #Por Vencer
         }else if($this->por_vencer == 'true'){
             $fecha_limite_min = date('Y-m-d');
             $fecha_limite_max = date('Y-m-d',strtotime(date('Y-m-d').' +10 day'));
@@ -247,7 +250,12 @@ class InventarioSearch extends Inventario
             $query->where(['between', 'fecha_vencimiento', $fecha_limite_min, $fecha_limite_max]);
             $query->andWhere(['egresoid' => null]);
             $query->andWhere(['falta' => 0]);
-        }else{ //Todos los productos en stock
+        #En Stock
+        }else{
+            //Join con Comprobante aprobados
+            $query->leftJoin("comprobante as c", "comprobanteid=c.id");        
+            $query->andWhere(['not',['c.approved_at' => null]]);
+            
             $query->andWhere(['defectuoso' => 0]);
             $query->andWhere(['or',
                 ['>','fecha_vencimiento', date('Y-m-d')],

@@ -108,7 +108,7 @@ class ComprobanteController extends ActiveController{
         }
     }
     
-    public function actionUpdate($id) {
+    public function actionAprobar($id) {
         $param = Yii::$app->request->post();
         $model = Comprobante::findOne(['id'=>$id]);
         
@@ -117,8 +117,10 @@ class ComprobanteController extends ActiveController{
         }
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $model->setScenario('update');
-            $model->setAttributes($param);            
+            $model->setAttributes($param);
+            #Aprobamos el comprobante seteando la fecha de aprobacion
+            $model->approved_at = date('Y-m-d H:i:s');
+
             if(!$model->save()){
                 throw new Exception(json_encode($model->getErrors()));
             }

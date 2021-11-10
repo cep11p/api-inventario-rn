@@ -16,6 +16,7 @@ use Yii;
  * @property integer $proveedorid
  * @property string $descripcion
  * @property string $create_at
+ * @property string $approved_at
  *
  * @property \app\models\Inventario[] $inventarios
  * @property \app\models\Proveedor $proveedor
@@ -41,7 +42,7 @@ abstract class Comprobante extends \yii\db\ActiveRecord
     {
         return [
             [['nro_remito', 'fecha_emision'], 'required'],
-            [['fecha_emision', 'create_at'], 'safe'],
+            [['fecha_emision', 'create_at', 'approved_at'], 'safe'],
             [['total'], 'number'],
             [['proveedorid'], 'integer'],
             [['descripcion'], 'string'],
@@ -64,6 +65,7 @@ abstract class Comprobante extends \yii\db\ActiveRecord
             'proveedorid' => 'Proveedorid',
             'descripcion' => 'Descripcion',
             'create_at' => 'Create At',
+            'approved_at' => 'Approved At',
         ];
     }
 

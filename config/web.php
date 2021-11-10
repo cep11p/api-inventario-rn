@@ -88,6 +88,8 @@ $config = [
                         'OPTIONS registrar-producto-faltante/{id}' => 'registrar-producto-faltante',
                         'PUT registrar-producto-pendiente/{id}' => 'registrar-producto-pendiente',
                         'OPTIONS registrar-producto-pendiente/{id}' => 'registrar-producto-pendiente',
+                        'PUT aprobar/{id}' => 'aprobar',
+                        'OPTIONS aprobar/{id}' => 'aprobar',
                     ], 
                 ],
                 [   

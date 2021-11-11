@@ -78,23 +78,29 @@ class Egreso extends BaseEgreso
      * @throws Exception
      */
     public function setListaProducto($param) {
-        $resultado=0;        
+        $resultado=0;       
+        
+        #validamos lista de productos
         if(!isset($param['lista_producto']) || count($param['lista_producto'])<1){
             throw new Exception('Lista de producto vacia.');
         }        
         
-        $ids = array();
+        #Recorre cada Producto para ser buscado en el stock
         foreach ($param['lista_producto'] as $value) {
             
-            /*** Rules ***/
+            #Validamos los parametros de producto
+
+            //productoid
             if(!isset($value['productoid']) || empty($value['productoid'])){
                 throw new Exception('En la lista de productos, algunos de ellos no tienen vinculado su id');
             }
             
+            //fecha_vencimiento
             if(isset($value['fecha_vencimiento']) && !empty($value['fecha_vencimiento']) && !\app\components\Help::validateDate($value['fecha_vencimiento'], 'Y-m-d')){
                 throw new Exception('La fecha debe tener el formato aaaa-mm-dd');
             }
-            
+
+            //fecha_vencimiento
             if(!isset($value['fecha_vencimiento']) || empty($value['fecha_vencimiento'])){
                 $value['fecha_vencimiento'] = null;
             }
@@ -122,26 +128,16 @@ class Egreso extends BaseEgreso
      * @param int $cantidad
      * @return int
      */
-    private function setEgreso($condicion, $cantidad) {
-        // preparamos las pre-condiciones de stock //
-        $condicion['falta']=0;
-        $condicion['defectuoso']=0;
-        $condicion['egresoid']=null;
-        
+    private function setEgreso($item, $cantidad) {
         
         $ids = array();
-        $itemsEncontrados = Inventario::find()->where($condicion)->asArray()->all();    
+        $itemsEncontrados = Inventario::buscarItemEnStock($item);
 
-        //chequeamos si hay stock
-        if(count($itemsEncontrados)<1){
-            throw new Exception('Hay productos que superan el stock disponible');
-        } 
-        
-        //chequeamos la cantidad de productos a egresar
+        //chequeamos la cantidad a egresar disponible
         if(isset($cantidad) && count($itemsEncontrados)<$cantidad){
             throw new Exception('La cantidad a egresar es mayor a la cantidad de productos en stock');
         } 
-        
+
         for ($i=0;$i<$cantidad;$i++){
             $ids[] = $itemsEncontrados[$i]['id'];
         }

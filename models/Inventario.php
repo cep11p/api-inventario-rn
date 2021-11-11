@@ -55,6 +55,40 @@ class Inventario extends BaseInventario
         }
 
     }
+
+    /**
+     * Se busca un item en stock
+     *
+     * @param [array] $item
+     * @return array
+     */
+    static public function buscarItemEnStock($item){
+
+        #Condiciones para
+        $item['falta']=0;
+        $item['defectuoso']=0;
+        $item['egresoid']=null;
+
+        $producto = Producto::findone(['id' => $item['productoid']])->toArray();
+        
+        if(empty($producto)){
+            throw new Exception("El producto ".$item['productoid']." no existe.");
+        }
+
+        $itemsEncontrados = Inventario::find()
+            ->where($item)
+            ->leftJoin("comprobante as c", "comprobanteid=c.id")
+            ->andWhere(['not',['c.approved_at' => null]])
+            ->asArray()
+            ->all();    
+
+        //chequeamos si hay stock
+        if(count($itemsEncontrados)<1){
+            throw new Exception("No hay stock del producto ".$producto['nombre']." ".$producto['unidad_valor'].$producto['unidad_medida']." (".$producto['marca'].")");
+        } 
+        
+        return $itemsEncontrados;
+    }
     
 
     /**

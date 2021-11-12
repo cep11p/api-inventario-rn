@@ -157,6 +157,38 @@ class InventarioSearch extends Inventario
     }
 
     /**
+     * Undocumented function
+     *
+     * @return array
+     */
+    private function getStock(){
+        $query = new \yii\db\Query();
+        
+        
+        $query->from(['inventario']);
+
+        //Join con Comprobante aprobados
+        $query->leftJoin("comprobante as c", "comprobanteid=c.id");        
+        $query->andWhere(['not',['c.approved_at' => null]]);
+
+        $query->andwhere(['defectuoso' => 0]);
+        $query->andWhere(['or',
+                ['>','fecha_vencimiento', date('Y-m-d')],
+                ['fecha_vencimiento' => null]
+            ]);
+        $query->andWhere(['falta' => 0]);
+        $query->andWhere(['egresoid' => null]);
+        $query->andWhere(['inactivo' => 0]);
+        
+        $command = $query->createCommand();        
+        $rows = $command->queryAll();
+        
+        // $resultado = ($rows[0]['cantidad_stock']=='')?0:$rows[0]['cantidad_stock'];
+                
+        return $rows;   
+    }
+
+    /**
     * Creates data provider instance with search query applied
     *
     * @param array $params
@@ -262,6 +294,7 @@ class InventarioSearch extends Inventario
                 ['fecha_vencimiento' => null]
             ]);
             $query->andWhere(['falta' => 0]);
+            $query->andWhere(['inactivo' => 0]);
             $query->andWhere(['egresoid' => null]);
         }
         
@@ -299,7 +332,7 @@ class InventarioSearch extends Inventario
         $data['cantidad_faltantes'] = $this->cantidadFaltantes();
         $data['cantidad_defectuosos'] = $this->cantidadDefectuosos();
         $data['cantidad_por_vencer'] = $this->cantidadProductoPorVencer();
-        $data['cantidad_stock'] = $this->cantidadStock();
+        $data['cantidad_stock'] = count($this->getStock());
         $data['resultado']=$coleccion;
         
         return $data;
@@ -493,8 +526,7 @@ class InventarioSearch extends Inventario
         ]);
         
         $rows = $query->createCommand()->queryAll();
-//
-//        print_r($query->createCommand()->getSql());die();
+
         $resultado = array();
         foreach ($rows as $value) {
             $resultado = $value['producto_cant_total'];

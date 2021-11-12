@@ -186,8 +186,6 @@ class InventarioSearch extends Inventario
         
         $command = $query->createCommand();        
         $rows = $command->queryAll();
-        
-        // $resultado = ($rows[0]['cantidad_stock']=='')?0:$rows[0]['cantidad_stock'];
                 
         return $rows;   
     }

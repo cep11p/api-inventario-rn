@@ -67,6 +67,7 @@ class Inventario extends BaseInventario
         #Condiciones para
         $item['falta']=0;
         $item['defectuoso']=0;
+        $item['inactivo']=0;
         $item['egresoid']=null;
 
         $producto = Producto::findone(['id' => $item['productoid']])->toArray();

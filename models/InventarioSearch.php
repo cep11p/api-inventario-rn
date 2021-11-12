@@ -167,18 +167,22 @@ class InventarioSearch extends Inventario
         
         $query->from(['inventario']);
 
-        //Join con Comprobante aprobados
+        //Que el comprabante sea aprobado
         $query->leftJoin("comprobante as c", "comprobanteid=c.id");        
         $query->andWhere(['not',['c.approved_at' => null]]);
 
-        $query->andwhere(['defectuoso' => 0]);
+        //no esté vencido
         $query->andWhere(['or',
-                ['>','fecha_vencimiento', date('Y-m-d')],
-                ['fecha_vencimiento' => null]
-            ]);
+            ['>','fecha_vencimiento', date('Y-m-d')],
+            ['fecha_vencimiento' => null]
+        ]);
+
+        //no defectuoso //no en falta //sin egreso //activo
+        $query->andwhere(['defectuoso' => 0]);
         $query->andWhere(['falta' => 0]);
         $query->andWhere(['egresoid' => null]);
         $query->andWhere(['inactivo' => 0]);
+
         
         $command = $query->createCommand();        
         $rows = $command->queryAll();

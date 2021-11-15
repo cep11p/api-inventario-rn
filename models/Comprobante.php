@@ -379,8 +379,10 @@ class Comprobante extends BaseComprobante
             },
             'proveedor'=> function($model){
                 return ($model->proveedor==null)?'':$model->proveedor;
+            },
+            'approved' => function($model){
+                return ($model->approved_at == null)?0:1;
             }
         ]);
-        
     }
 }

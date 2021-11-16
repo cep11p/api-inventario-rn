@@ -48,6 +48,9 @@ $config = [
         'lugar'=> [
             'class' => $params['servicioLugar'],//'app\components\ServicioLugar'
         ],
+        'registral'=> [
+            'class' => $params['servicioRegistral'],//'app\components\ServicioLugar'
+        ],
         /************* Fin Componente interoperable *************/
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
@@ -146,6 +149,18 @@ $config = [
                 [   #Localidad
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'api/localidad', 
+                ],
+                 ##### Interoperabilidad con Registral #####
+                [   #persona
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'api/persona', 
+                    'extraPatterns' => [
+                        'GET buscar-por-documento/{nro_documento}' => 'buscar-por-documento',
+                        'OPTIONS buscar-por-documento/{nro_documento}' => 'buscar-por-documento',
+                        'PUT contacto/{id}' => 'contacto',
+                        'OPTIONS contacto/{id}' => 'contacto',
+                    ],
+                    'tokens' => [ '{id}' => '<id:\\w+>', '{nro_documento}'=>'<nro_documento:\\w+>' ],
                 ],
             ]
         ],

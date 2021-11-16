@@ -6,4 +6,8 @@ return [
     'senderName' => 'Example.com mailer',
     'JWT_SECRET' => 'ZqCeBt}246',
     'servicioLugar'=> getenv('SERVICIO_LUGAR')?getenv('SERVICIO_LUGAR'):'app\components\DummyServicioLugar',
+    'servicioRegistral'=> getenv('SERVICIO_REGISTRAL')?getenv('SERVICIO_REGISTRAL'):'app\components\DummyServicioRegistral',
+    'UID_REGISTRAL'=>'4',
+    'REGISTRAL_JWT_SECRET' => 'ZqCeBt}531',
+    'USUARIO_REGISTRAL'=>'inventario',
 ];

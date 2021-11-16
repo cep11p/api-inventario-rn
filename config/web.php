@@ -135,6 +135,14 @@ $config = [
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'api/unidad-medida'
                 ],
+                [   #Permiso
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'api/permiso', 
+                ],
+                [   #Rol
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'api/rol', 
+                ],
                 /****** USUARIOS *******/
                 [   
                     'class' => 'yii\rest\UrlRule',

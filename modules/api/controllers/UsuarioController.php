@@ -168,30 +168,27 @@ class UsuarioController extends ActiveController
         return $resultado;
     }
     
-    public function actionCreate() {
-        $param = Yii::$app->request->post(); 
+    /**
+     * Se registra un usuario con rol, personaid y localidadid
+     *
+     * @return void
+     */
+    public function actionCreate(){
+        $resultado['message']='Se crea un usuario';
+        $params = Yii::$app->request->post();
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            
-            $model = new \app\models\ApiUser();
-            $model->setScenario('register');
-            $model->setAttributes($param);
-            
-            
-            if(!$model->register()){
-                throw new Exception(json_encode($model->getErrors()));
-            }
-            
-            $transaction->commit();
-            $resultado['success'] =  true;
-            $resultado['data']['id'] =  $model->id;
+       
+            $resultado['data']['id'] = User::registrarUsuario($params);
 
+            $transaction->commit();
             return $resultado;
-           
-        }catch (Exception $exc) {
+        }catch (\yii\web\HttpException $exc) {
             $transaction->rollBack();
             $mensaje =$exc->getMessage();
-            throw new \yii\web\HttpException(400, $mensaje);
+            $statuCode =$exc->statusCode;
+            throw new \yii\web\HttpException($statuCode, $mensaje);
         }
     }
 

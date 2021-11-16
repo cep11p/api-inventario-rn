@@ -3,6 +3,7 @@
 namespace app\modules\api\controllers;
 
 use app\models\User;
+use app\models\UserPersona;
 use yii\rest\ActiveController;
 use Yii;
 use yii\web\Response;
@@ -10,7 +11,7 @@ use dektrium\user\Finder;
 use dektrium\user\helpers\Password;
 use dektrium\user\Module;
 use yii\base\Exception;
-
+use yii\helpers\ArrayHelper;
 
 class UsuarioController extends ActiveController
 {
@@ -99,6 +100,11 @@ class UsuarioController extends ActiveController
      *
      * @return Response|array
      */
+    /**
+     * Login action.
+     *
+     * @return Response|array
+     */
     public function actionLogin()
     {
         $parametros = Yii::$app->getRequest()->getBodyParams();
@@ -109,10 +115,27 @@ class UsuarioController extends ActiveController
         if(!($usuario !== null && Password::validate($parametros['password_hash'],$usuario->password_hash))){
             throw new \yii\web\HttpException(401, 'usuario o contraseña inválido');
         }
-                
+        
+        #Buscamos la tabla relacional user_persona
+        $userPersona = UserPersona::findOne(['userid'=>$usuario->id]);
+        
+        #Chequeamos si exite el userpersona
+        if($userPersona == null){
+            throw new \yii\web\HttpException(401, 'El usuario '.$usuario->id.' tiene una inconsitencia con la tabla user_persona');
+        }
+        
+        #Validamos si el usuario esta habilitado
+        if($userPersona->fecha_baja != null){
+            throw new \yii\web\HttpException(401, 'El usuario se encuentra inhabilitado');
+        }
+        
         #Registramos el horario de ingreso
         $usuario->last_login_at = time();
         $usuario->save();
+
+        #Registramos la ip de ingreso
+        $userPersona->last_login_ip = Yii::$app->getRequest()->getUserIP();
+        $userPersona->save();
 
         #Generamos el Token
         $payload = [
@@ -134,9 +157,14 @@ class UsuarioController extends ActiveController
         $resultado = [
             'access_token' => $token,
             'username' => $usuario->username,
-            'rol' => $rol,
+            'rol' => $rol
         ];
         
+        #Si es diferente de admin
+        if($rol != 'admin'){
+            $resultado = ArrayHelper::merge($userPersona->persona, $resultado);
+        }
+
         return $resultado;
     }
     

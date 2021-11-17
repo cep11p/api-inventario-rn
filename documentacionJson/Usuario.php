@@ -155,7 +155,6 @@
 * @param arrayJson
 {
 	"usuarioid": 15,
-    "tipo_convenioid": 2,
 	"lista_permiso":[
 		{"name":"cuenta_bps_importar"},
 		{"name":"cuenta_ver"}

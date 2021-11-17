@@ -2,6 +2,7 @@
 
 namespace app\modules\api\controllers;
 
+use app\components\VinculoInteroperableHelp;
 use app\models\User;
 use app\models\UserPersona;
 use yii\rest\ActiveController;
@@ -93,6 +94,18 @@ class UsuarioController extends ActiveController
         unset($actions['update']);
         unset($actions['view']);
         return $actions;
+    }
+
+    public function prepareDataProvider() 
+    {
+        $searchModel = new \app\models\UserSearch();
+        $params = \Yii::$app->request->queryParams;
+        $resultado = $searchModel->search($params);
+
+        $resultado['resultado'] = VinculoInteroperableHelp::vincularDatosLocalidad($resultado['resultado']);
+        $resultado['resultado'] = VinculoInteroperableHelp::vincularDatosPersona($resultado['resultado'],['nombre','apellido','nro_documento','cuil']);
+
+        return $resultado;
     }
     
     /**

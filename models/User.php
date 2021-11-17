@@ -246,14 +246,11 @@ class User extends ApiUser
         if(!isset($params['usuario']['personaid']) || empty($params['usuario']['personaid'])){
             $params['usuario']['personaid'] = $user->registrarPersona($params);
         }
-
+        
         #Vinculamos la persona
         $userPersona = new UserPersona();
         $userPersona->setAttributes($params['usuario']);
         $userPersona->userid = $id;
-
-        $userPersona->addError('pepe','esto es un error1');
-        $userPersona->addError('pepe2','esto es un error2');
 
         if(!$userPersona->save()){
             throw new \yii\web\HttpException(400, json_encode(array($userPersona->errors)));

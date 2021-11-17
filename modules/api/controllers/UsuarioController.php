@@ -109,11 +109,18 @@ class UsuarioController extends ActiveController
         return $resultado;
     }
     
-    /**
-     * Login action.
-     *
-     * @return Response|array
-     */
+    public function actionView($id){
+        $model = User::findOne(['id'=>$id]);            
+        if($model==NULL){
+            throw new \yii\web\HttpException(400, 'El usuario con el id '.$id.' no existe!');
+        }
+        
+        $resultado = ArrayHelper::merge($model->toArray(),$model->userPersona->persona);
+        $resultado['localidad'] = $model->userPersona->localidad;
+        
+        return $resultado;
+    }
+    
     /**
      * Login action.
      *

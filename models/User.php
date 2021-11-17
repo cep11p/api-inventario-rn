@@ -48,37 +48,25 @@ class User extends ApiUser
             throw new \yii\web\HttpException(400, 'Falta la lista de permisos');
         }
 
-        #Chequeamos el tipo convenio
-        if(!isset($params['tipo_convenioid']) || empty($params['tipo_convenioid'])){
-            throw new \yii\web\HttpException(400, json_encode(['error'=>['Falta el Tipo Convenio']]));
-        }
-
         #Buscamos el permiso distinto a borrar
-        $permisos = UsuarioHasConvenio::find()->select('permiso')->where(['userid'=>$params['usuarioid']])->andWhere(['!=','tipo_convenioid',$params['tipo_convenioid']])->distinct()->asArray()->all();
+        $permisos_a_borrar = AuthAssignment::find()->select('item_name')->leftJoin('auth_item i','item_name=i.name')->where(['user_id'=>$params['usuarioid'], 'i.type' => AuthItem::PERMISO])->distinct()->asArray()->all();
 
-        $i=0;
-        foreach ($params['lista_permiso'] as $permiso_borrar) {
-            foreach ($permisos as $permiso_bd) {
-                if($permiso_borrar == $permiso_bd['permiso']){
-                    unset($params['lista_permiso'][$i]);
+        foreach ($params['lista_permiso'] as $k => $new_value) {
+            foreach ($permisos_a_borrar as $v => $bd_value) {
+                if ($new_value['name'] == $bd_value['item_name'] ) {
+                    unset($permisos_a_borrar[$v]);
                 }
             }
-            $i++;
-        }
 
+        }
+        
         #Borramos los permisos (auth_assigment)
         if(!empty($params['lista_permiso'])){
             AuthAssignment::deleteAll([
                 'user_id'=>$params['usuarioid'],
-                'item_name'=>$params['lista_permiso']
+                'item_name'=>$permisos_a_borrar
             ]);
         }
-
-        #Borramos la regla (usuario_has_convenio)
-        UsuarioHasConvenio::deleteAll([
-            'userid'=>$params['usuarioid'],
-            'tipo_convenioid'=>$params['tipo_convenioid']
-        ]);
     }
 
     public static function setAsignacion($params){
@@ -101,20 +89,6 @@ class User extends ApiUser
                     }
                 }
             }
-
-            #Asociamos el convenio (vinculacion de convenio, permiso y usuario)
-            foreach ($params['lista_permiso'] as $value) {
-                $model = new UsuarioHasConvenio();
-                $model->setAttributes([
-                    'userid'=>$params['usuarioid'],
-                    'tipo_convenioid'=>$params['tipo_convenioid'],
-                    'permiso'=>$value['name']
-                ]);
-
-                if(!$model->save()){
-                    throw new \yii\web\HttpException(400, json_encode($auth_assignment->errors));
-                }
-            }
             
             $transaction->commit();
 
@@ -129,31 +103,36 @@ class User extends ApiUser
     
 
     public function getAsignaciones(){
-        $lista_tipo_convenio = $this->getTipoConveniosAsociados();
 
         $i=0;
-        foreach ($lista_tipo_convenio as $value) {
+        $query = new Query();        
             $query = new Query();        
-            $query->select([
-                'permiso'
-            ]);
-            $query->from('usuario_has_convenio');
-            $query->where([
-                'userid'=>$this->id,
-                'tipo_convenioid'=>$value['tipo_convenioid']
-            ]);
-            
-            $command = $query->createCommand();
-            $rows = $command->queryAll();
-            
-            $permisos = array();
-            foreach ($rows as $value) {
-                $permisos[] = $value['permiso'];
-            }
-            $lista_tipo_convenio[$i]['lista_permiso'] = $permisos;
-            $lista_tipo_convenio[$i]['usuarioid'] = $this->id;
-            $i++;
+        $query = new Query();        
+            $query = new Query();        
+        $query = new Query();        
+            $query = new Query();        
+        $query = new Query();        
+        $query->select([
+            '*'
+        ]);
+        $query->from('auth_assignment');
+        $query->leftJoin('auth_item as i','item_name=i.name');
+        $query->where([
+            'user_id' => $this->id,
+            'i.type' => 2 //Permiso
+        ]);
+        
+        $command = $query->createCommand();
+        $rows = $command->queryAll();
+        
+        $permisos = array();
+        foreach ($rows as $value) {
+            $permisos[] = $value['item_name'];
         }
+        $lista_tipo_convenio[$i]['lista_permiso'] = $permisos;
+        $lista_tipo_convenio[$i]['usuarioid'] = $this->id;
+        $i++;
+        
                 
         return $lista_tipo_convenio;
     }

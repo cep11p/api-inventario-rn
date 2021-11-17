@@ -233,6 +233,38 @@ class UsuarioController extends ActiveController
         return $resultado;
     }
 
+    /**
+     * Se asignan permisos por programa a un usuario
+     *
+     * @return void
+     */
+    public function actionCrearAsignacion(){
+        $params = Yii::$app->request->post();
+        $resultado['success'] = false;
+        if(User::setAsignacion($params)){
+            $resultado['success'] = true;
+            $resultado['mensaje'] = 'Asignaciones guardadas exitosamente!';
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * Listamos todos los permisos asignados a un usuario, Este listado esta agrupado
+     *
+     * @param [int] $id
+     * @return void
+     */
+    public function actionListarAsignacion($id){
+        $model = User::findOne(['id'=>$id]);            
+        if($model==NULL){
+            throw new \yii\web\HttpException(400, 'El usuario con el id '.$id.' no existe!');
+        }
+        $resultado = $model->getAsignaciones();
+
+        return $resultado;
+    }
+
     
     
     

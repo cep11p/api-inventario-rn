@@ -93,6 +93,7 @@ class UsuarioController extends ActiveController
         unset($actions['create']);
         unset($actions['update']);
         unset($actions['view']);
+        $actions['index']['prepareDataProvider'] = [$this, 'prepareDataProvider'];
         return $actions;
     }
 

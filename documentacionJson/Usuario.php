@@ -106,12 +106,13 @@
 }
 **/
 
-/**** Dar de baja un Usuarios*****
+/**** habilitar o deshabilitar un Usuarios*****
 * @url http://api.inventario.local/api/usuarios/baja/47 
 * @method PUT
 * @param arrayJson
+* @param['baja] = true or false
 {
-  "baja":true,
+    "baja":true,
 	"descripcion_baja":"Esto es una descripcion de baja de usuario"
 }
 **/

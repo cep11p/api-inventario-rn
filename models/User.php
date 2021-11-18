@@ -327,6 +327,12 @@ class User extends ApiUser
 
     }
 
+    /**
+     * Esta funcion inhabilitar un usuario
+     *
+     * @param [array] $params
+     * @return void
+     */
     public function setBaja($params)
     {
         $resultado = false;
@@ -349,6 +355,12 @@ class User extends ApiUser
         return $resultado;
     }
 
+    /**
+     * Esta funcion habilita un usuario
+     *
+     * @param [type] $params
+     * @return void
+     */
     public function unSetBaja($params)
     {
         $resultado = false;

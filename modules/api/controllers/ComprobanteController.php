@@ -86,6 +86,11 @@ class ComprobanteController extends ActiveController{
         
         $transaction = Yii::$app->db->beginTransaction();
         try {
+
+            if (!\Yii::$app->user->can('comprobante_crear')) {
+                throw new \yii\web\HttpException(403, 'No se tienen permisos necesarios para ejecutar esta acción');
+            }
+
             /**** Nuevo Comprobante *****/
             $model = new Comprobante();
             $model->setAttributesCustom($param);
@@ -109,6 +114,11 @@ class ComprobanteController extends ActiveController{
     }
     
     public function actionAprobar($id) {
+        
+        if (!\Yii::$app->user->can('comprobante_aprobar')) {
+            throw new \yii\web\HttpException(403, 'No se tienen permisos necesarios para ejecutar esta acción');
+        }
+
         $param = Yii::$app->request->post();
         $model = Comprobante::findOne(['id'=>$id]);
         

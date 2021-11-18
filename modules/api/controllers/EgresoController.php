@@ -82,6 +82,10 @@ class EgresoController extends ActiveController{
     }
     
     public function actionCreate() {
+        if (!\Yii::$app->user->can('egreso_alta')) {
+            throw new \yii\web\HttpException(403, 'No se tienen permisos necesarios para ejecutar esta acción');
+        }
+
         $param = Yii::$app->request->post();
         $model = new Egreso();
         $transaction = Yii::$app->db->beginTransaction();

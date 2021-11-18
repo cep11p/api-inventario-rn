@@ -144,7 +144,6 @@ $config = [
                     'controller' => 'api/rol', 
                 ],
                 /****** USUARIOS *******/
-                /****** USUARIOS *******/
                 [   #Usuario
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'api/usuario',   

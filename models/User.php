@@ -106,12 +106,6 @@ class User extends ApiUser
 
         $i=0;
         $query = new Query();        
-            $query = new Query();        
-        $query = new Query();        
-            $query = new Query();        
-        $query = new Query();        
-            $query = new Query();        
-        $query = new Query();        
         $query->select([
             '*'
         ]);
@@ -119,7 +113,7 @@ class User extends ApiUser
         $query->leftJoin('auth_item as i','item_name=i.name');
         $query->where([
             'user_id' => $this->id,
-            'i.type' => 2 //Permiso
+            'i.type' => AuthItem::PERMISO
         ]);
         
         $command = $query->createCommand();
@@ -129,12 +123,10 @@ class User extends ApiUser
         foreach ($rows as $value) {
             $permisos[] = $value['item_name'];
         }
-        $lista_tipo_convenio[$i]['lista_permiso'] = $permisos;
-        $lista_tipo_convenio[$i]['usuarioid'] = $this->id;
-        $i++;
-        
+        $resultado['usuarioid'] = $this->id;
+        $resultado['lista_permiso'] = $permisos;
                 
-        return $lista_tipo_convenio;
+        return $resultado;
     }
 
     public function getTipoConveniosAsociados(){

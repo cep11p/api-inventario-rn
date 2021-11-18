@@ -87,10 +87,10 @@ class VinculoInteroperableHelp extends \yii\base\Component{
         }
         
         $coleccion = [];
-        if(isset($params)){
+        if(isset($lista)){
             $response = \Yii::$app->lugar->buscarLocalidad(array("ids"=>$ids,"pagesize"=>$pagesize));   
         }
-        
+
         if(isset($response['resultado']) && count($response['resultado'])>0){
             $coleccion = $response['resultado'];
         }
@@ -105,7 +105,6 @@ class VinculoInteroperableHelp extends \yii\base\Component{
             }
             $i++;
         }
-        
         return $lista;
     }
 

@@ -265,7 +265,20 @@ class UsuarioController extends ActiveController
         return $resultado;
     }
 
-    
-    
+    /**
+     * Se borran los permisos asignados a un usuario
+     *
+     * @return void
+     */
+    public function actionBorrarAsignacion(){
+        $params = Yii::$app->request->post();
+        $resultado['success'] = false;
+        if(User::borrarAsignaciones($params)){
+            $resultado['success'] = true;
+            $resultado['mensaje'] = 'Se borraron asignaciones correctamente!';
+        }
+
+        return $resultado;
+    }
     
 }

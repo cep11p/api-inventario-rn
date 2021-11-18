@@ -160,10 +160,18 @@ class User extends ApiUser
             throw new \yii\web\HttpException(400, 'El usuario con el id '.$params['usuarioid'].' no existe!');
         }
 
+        if(!isset($params['lista_permiso']) || empty($params['lista_permiso'])){
+            throw new \yii\web\HttpException(400, 'Falta lista de permisos');
+        }
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
 
-            SELF::limpiarPermisos($params);
+            AuthAssignment::deleteAll([
+                'user_id'=>$params['usuarioid'],
+                'item_name'=>$params['lista_permiso']
+            ]);
+
             $transaction->commit();
 
             return true;

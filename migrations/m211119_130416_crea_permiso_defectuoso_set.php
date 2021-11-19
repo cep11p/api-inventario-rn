@@ -14,7 +14,7 @@ class m211119_130416_crea_permiso_defectuoso_set extends Migration
     public function safeUp()
     {
         $this->insert('auth_item', [
-            'name' => 'deftuoso_set',
+            'name' => 'defectuoso_set',
             'type' => AuthItem::PERMISO,
             'description' => 'Este permiso nos permite setear items defectusos en el inventario'
         ]);

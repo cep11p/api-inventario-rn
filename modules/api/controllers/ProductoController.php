@@ -68,6 +68,11 @@ class ProductoController extends ActiveController{
     
     public function actionCreate() 
     {
+        #Permiso
+        if (!\Yii::$app->user->can('producto_crear')) {
+            throw new \yii\web\HttpException(403, 'No se tienen permisos necesarios para ejecutar esta acción');
+        }
+
         $param = Yii::$app->request->post();
         
         $model = new Producto();

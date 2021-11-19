@@ -67,40 +67,8 @@ class InventarioController extends ActiveController{
         return $resultado;
     }
     
-    /**
-     * Esta accion permite realizar modificacion de ingresos. Se puede modificar dentro de 2 horas
-     *
-    //  * @return void
-     */
-    // public function actionUpdate($id){
-    //     $param = Yii::$app->request->post();
-    //     $param['comprobanteid'] = $id;
-        
-    //     $transaction = Yii::$app->db->beginTransaction();
-    //     try {
-            
-    //         $model = Inventario::findOne(['comprobanteid' => $id]);
-    //         if($model == Null){
-    //             throw new Exception('El comprobante a modificar no existe.');
-    //         }
-    //         $comprobanteid = $model->modificarStock($param);
-
-    //         $transaction->commit();
-            
-    //         $resultado['message']='Se modifica un nuevo stock';
-    //         $resultado['comprobanteid']=$comprobanteid;
-            
-    //         return  $resultado;
-           
-    //     }catch (Exception $exc) {
-    //         $transaction->rollBack();
-    //         $mensaje =$exc->getMessage();
-    //         throw new \yii\web\HttpException(400, $mensaje);
-    //     }
-    // }
-    
-     public function actionSetDefectuoso() {
-
+    public function actionSetDefectuoso() {
+        #Permiso
         if (!\Yii::$app->user->can('defectuoso_set')) {
             throw new \yii\web\HttpException(403, 'No se tienen permisos necesarios para ejecutar esta acción');
         }

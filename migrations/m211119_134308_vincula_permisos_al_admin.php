@@ -28,10 +28,6 @@ class m211119_134308_vincula_permisos_al_admin extends Migration
             'item_name' => 'defectuoso_set',
             'user_id' => '1'
         ]);
-        $this->insert('auth_assignment', [
-            'item_name' => 'producto_crear',
-            'user_id' => '1'
-        ]);
     
     
     }

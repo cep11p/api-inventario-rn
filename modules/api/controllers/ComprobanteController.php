@@ -157,6 +157,11 @@ class ComprobanteController extends ActiveController{
      * @throws \yii\web\HttpException
      */
     public function actionRegistrarProductoPendiente($id) {
+
+        if (!\Yii::$app->user->can('producto_faltante_set')) {
+            throw new \yii\web\HttpException(403, 'No se tienen permisos necesarios para ejecutar esta acción');
+        }
+
         $param = \Yii::$app->request->post();
         $model = Comprobante::findOne(['id'=>$id]);
 

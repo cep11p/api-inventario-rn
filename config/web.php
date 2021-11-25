@@ -89,8 +89,8 @@ $config = [
                     'extraPatterns' => [
                         'PUT registrar-producto-faltante/{id}' => 'registrar-producto-faltante',
                         'OPTIONS registrar-producto-faltante/{id}' => 'registrar-producto-faltante',
-                        'PUT registrar-producto-pendiente/{id}' => 'registrar-producto-pendiente',
-                        'OPTIONS registrar-producto-pendiente/{id}' => 'registrar-producto-pendiente',
+                        'PUT set-producto-faltante/{id}' => 'set-producto-faltante',
+                        'OPTIONS set-producto-faltante/{id}' => 'set-producto-faltante',
                         'PUT aprobar/{id}' => 'aprobar',
                         'OPTIONS aprobar/{id}' => 'aprobar',
                     ], 

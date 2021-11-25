@@ -86,7 +86,7 @@
 /**** Para registrar las modificaciones que hay sobre un producto en un comprobante*****
 * Hay aveces que le proveedor no entrega todos los productos que dice en el comprobantes..
  * Por lo tanto registramos los productos que estan pendiente en entrega con falta=true o viceversa
-* @url http://api.gestor-inventario.local/comprobantes/registrar-producto-pendiente/{$id} 
+* @url http://api.gestor-inventario.local/comprobantes/set-producto-faltante/{$id} 
 * @method PUT
 * @param arrayJson
     {

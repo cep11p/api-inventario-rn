@@ -2,7 +2,7 @@
 
 /**** Para mostrar listado ****/
 /**
-* @url http://api.gestor-inventario.local/inventarios?parametro1=valor1&parametro2=valor2
+* @url http://api.inventario.local/inventarios?parametro1=valor1&parametro2=valor2
 * @parametros estos parametros sirven como criterio de busqueda
  * fecha_vencimiento=2020-03-03
  * fecha_emision=2020-03-03
@@ -85,7 +85,7 @@
 */
 
 /*****Para crear****
-* @url http://api.gestor-inventario.local/inventarios 
+* @url http://api.inventario.local/inventarios 
 * @method POST
 * @param arrayJson
     {
@@ -103,20 +103,20 @@
 **/
 
 /**** Para modificar*****
-* @url http://api.gestor-inventario.local/inventarios/{$id} 
+* @url http://api.inventario.local/inventarios/{$id} 
 * @method PUT
 * @param arrayJson
 **/
 
 /****** Para visualizar*****
-* @url http://api.gestor-inventario.local/inventarios/{$id} 
+* @url http://api.inventario.local/inventarios/{$id} 
 * @method GET
 * @return arrayJson
 */
 
 /****** Para setear un producto defectuoso o viceversa*****
  * Se necesita el productoid y la fecha exacta para agrupar y cuantificar la cantidad exacta a setear como defectuoso o viceversa. Es funcion asigna y desasigna defectuosos
-* @url http://api.gestor-inventario.local/inventarios/set-defectuoso 
+* @url http://api.inventario.local/inventarios/set-defectuoso 
 * @method POST
 * @params arrayJson
 {

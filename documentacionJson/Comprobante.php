@@ -2,8 +2,8 @@
 
 /**** Para mostrar listado ****/
 /**
-* @url http://api.gestor-inventario.local/comprobantes
-* @url con parametros http://api.gestor-inventario.local/comprobantes?global_param=00001&fecha_desde=2015-03-03
+* @url http://api.inventario.local/comprobantes
+* @url con parametros http://api.inventario.local/comprobantes?global_param=00001&fecha_desde=2015-03-03
 * @method GET
 * @parametros estos parametros sirven como criterio de busqueda
 * global_param = (nro de remito)
@@ -71,22 +71,32 @@
 */
 
 /*****Para crear****
-* @url http://api.gestor-inventario.local/comprobantes 
+* @url http://api.inventario.local/comprobantes 
 * @method POST
 * @param arrayJson
 **/
 
 /**** Para modificar*****
-* @url http://api.gestor-inventario.local/comprobantes/{$id} 
+* @url http://api.inventario.local/comprobantes/{$id} 
 * @method PUT
 * @param arrayJson
+{
+  "nro_remito":"0001-00401",
+  "fecha_emision":"2020-03-15",
+  "total":292.99,
+  "descripcion":"esto es una descripcion del stock entrante",
+  "lista_producto":[
+    {"productoid":1,"precio_unitario":120,"fecha_vencimiento":"2022-01-20","cantidad":10},
+    {"productoid":2,"precio_unitario":120,"fecha_vencimiento":"2022-01-22","cantidad":5}
+  ]
+}
 **/
 
 
 /**** Para registrar las modificaciones que hay sobre un producto en un comprobante*****
 * Hay aveces que le proveedor no entrega todos los productos que dice en el comprobantes..
  * Por lo tanto registramos los productos que estan pendiente en entrega con falta=true o viceversa
-* @url http://api.gestor-inventario.local/comprobantes/set-producto-faltante/{$id} 
+* @url http://api.inventario.local/comprobantes/set-producto-faltante/{$id} 
 * @method PUT
 * @param arrayJson
     {
@@ -102,7 +112,7 @@
 **/
 
 /****** Para visualizar*****
-* @url http://api.gestor-inventario.local/comprobantes/{$id} 
+* @url http://api.inventario.local/comprobantes/{$id} 
 * @method GET
 * @return arrayJson
 {

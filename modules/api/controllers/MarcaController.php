@@ -51,9 +51,9 @@ class MarcaController extends ActiveController{
     public function actions()
     {
         $actions = parent::actions();
-//        unset($actions['create']);
-//        unset($actions['update']);
-//        unset($actions['delete']);
+        unset($actions['create']);
+        unset($actions['update']);
+        unset($actions['delete']);
         $actions['index']['prepareDataProvider'] = [$this, 'prepareDataProvider'];
         return $actions;
     }
@@ -67,5 +67,62 @@ class MarcaController extends ActiveController{
         return $resultado;
     }
     
+    public function actionCreate() 
+    {   $param = Yii::$app->request->post();
+        
+        $model = new Marca();
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            
+            $model->setAttributesCustom($param);
+            
+            if(!$model->save()){
+                throw new Exception(json_encode($model->getErrors()));
+            }
+
+            $transaction->commit();
+            
+            $resultado['message']='Se registra una nueva Marca';
+            $resultado['id']=$model->id;
+            
+            return  $resultado;
+           
+        }catch (Exception $exc) {
+            $transaction->rollBack();
+            $mensaje =$exc->getMessage();
+            throw new \yii\web\HttpException(400, $mensaje);
+        }
+    }
+
+    public function actionUpdate($id) 
+    {          
+        $param = Yii::$app->request->post();
+        $model = Marca::findOne(['id'=>$id]);
+        
+        if($model==null){
+            throw new Exception(json_encode('La Marca no existe'));
+        }
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            
+            $model->setAttributesCustom($param);
+            
+            if(!$model->save()){
+                throw new Exception(json_encode($model->getErrors()));
+            }
+
+            $transaction->commit();
+            
+            $resultado['message']='Se registra una nueva Marca';
+            $resultado['id']=$model->id;
+            
+            return  $resultado;
+           
+        }catch (Exception $exc) {
+            $transaction->rollBack();
+            $mensaje =$exc->getMessage();
+            throw new \yii\web\HttpException(400, $mensaje);
+        }
+    }
         
 }

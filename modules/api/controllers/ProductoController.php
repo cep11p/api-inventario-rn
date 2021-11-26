@@ -79,7 +79,7 @@ class ProductoController extends ActiveController{
         $transaction = Yii::$app->db->beginTransaction();
         try {
             
-            $model->setAttributes($param);
+            $model->setAttributesCustom($param);
             $model->codigo = $model->generarCodigo(4);
             
             if(!$model->save()){
@@ -88,7 +88,7 @@ class ProductoController extends ActiveController{
 
             $transaction->commit();
             
-            $resultado['message']='Se guarda un nuevo stock';
+            $resultado['message']='Se registra un nuevo Producto';
             $resultado['id']=$model->id;
             
             return  $resultado;

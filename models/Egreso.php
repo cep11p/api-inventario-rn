@@ -25,6 +25,9 @@ class Egreso extends BaseEgreso
     public function setAttributesCustom($values, $safeOnly = true) {
         parent::setAttributes($values, $safeOnly);
         $this->fecha_inicial = date('Y-m-d');
+        $this->origen = ucfirst(strtolower($this->origen));
+        $this->destino_nombre = ucfirst(strtolower($this->destino_nombre));
+        $this->destino_localidadid = ucfirst(strtolower($this->destino_localidadid));
     }
     
     /**

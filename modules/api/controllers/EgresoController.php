@@ -51,7 +51,7 @@ class EgresoController extends ActiveController{
     {
         $actions = parent::actions();
         unset($actions['create']);
-//        unset($actions['update']);
+        unset($actions['update']);
         unset($actions['view']);
         $actions['index']['prepareDataProvider'] = [$this, 'prepareDataProvider'];
         return $actions;

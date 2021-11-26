@@ -32,6 +32,11 @@ class Producto extends BaseProducto
             ]
         );
     }
+
+    public function setAttributesCustom($values, $safeOnly = true) {
+        parent::setAttributes($values, $safeOnly);
+        $this->nombre = ucfirst(strtolower($this->nombre));
+    }
     
     /**
      * Seteamos el atributo activo de un producto

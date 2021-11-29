@@ -182,6 +182,38 @@ class ComprobanteController extends ActiveController{
             throw new \yii\web\HttpException(400, $mensaje);
         }
     }
+
+    public function actionSetDescripcion($id) {
+        
+        if (!\Yii::$app->user->can('comprobante_modificar')) {
+            throw new \yii\web\HttpException(403, 'No se tienen permisos necesarios para ejecutar esta acción');
+        }
+
+        $param = Yii::$app->request->post();
+        $model = Comprobante::findOne(['id'=>$id]);
+        
+        if($model==null){
+            throw new Exception(json_encode('El comprobante no existe'));
+        }
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $model->descripcion = (isset($param['descripcion']) && !empty($param['descripcion']))?$param['descripcion']:"";
+
+            if(!$model->save()){
+                throw new Exception(json_encode($model->getErrors()));
+            }
+
+            $transaction->commit();
+        
+            $resultado['id'] = $model->id;
+            return $resultado;
+           
+        }catch (Exception $exc) {
+            $transaction->rollBack();
+            $mensaje =$exc->getMessage();
+            throw new \yii\web\HttpException(400, $mensaje);
+        }
+    }
     
     /**
      * Se registran productos pendientes de entrega. Se modifican los productos en falta = 1 a falta = 0

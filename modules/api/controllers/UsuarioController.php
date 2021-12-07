@@ -160,27 +160,14 @@ class UsuarioController extends ActiveController
         if(!($usuario !== null && Password::validate($parametros['password_hash'],$usuario->password_hash))){
             throw new \yii\web\HttpException(401, 'usuario o contraseña inválido');
         }
-        
-        #Buscamos la tabla relacional user_persona
-        $userPersona = UserPersona::findOne(['userid'=>$usuario->id]);
-        
-        #Chequeamos si exite el userpersona
-        if($userPersona == null){
-            throw new \yii\web\HttpException(401, 'El usuario '.$usuario->id.' tiene una inconsitencia con la tabla user_persona');
-        }
-        
-        #Validamos si el usuario esta habilitado
-        if($userPersona->fecha_baja != null){
-            throw new \yii\web\HttpException(401, 'El usuario se encuentra inhabilitado');
-        }
-        
-        #Registramos el horario de ingreso
-        $usuario->last_login_at = time();
-        $usuario->save();
 
-        #Registramos la ip de ingreso
-        $userPersona->last_login_ip = Yii::$app->getRequest()->getUserIP();
-        $userPersona->save();
+        #Obtenemos el Rol
+        $rol = '';
+        $roles = \Yii::$app->authManager->getRolesByUser($usuario->id);
+        foreach($roles as $value){
+            $rol = $value->name;
+            break;
+        }
 
         #Generamos el Token
         $payload = [
@@ -190,13 +177,7 @@ class UsuarioController extends ActiveController
         ];
         $token = \Firebase\JWT\JWT::encode($payload, \Yii::$app->params['JWT_SECRET']);
 
-        #Obtenemos el Rol
-        $rol = '';
-        $roles = \Yii::$app->authManager->getRolesByUser($usuario->id);
-        foreach($roles as $value){
-            $rol = $value->name;
-            break;
-        }
+        
         
         #Seteamos principales datos del resultado
         $resultado = [
@@ -204,9 +185,30 @@ class UsuarioController extends ActiveController
             'username' => $usuario->username,
             'rol' => $rol
         ];
-        
-        #Si es diferente de admin
-        if($rol != 'admin'){
+
+        #vinculamos persona solo si el usuario tiene el rol "Usuario" o "Soporte"
+        if($rol == 'usuario' || $rol == 'soporte'){
+            #Buscamos la tabla relacional user_persona
+            $userPersona = UserPersona::findOne(['userid'=>$usuario->id]);
+            
+            #Chequeamos si exite el userpersona
+            if($userPersona == null){
+                throw new \yii\web\HttpException(401, 'El usuario '.$usuario->id.' tiene una inconsitencia con la tabla user_persona');
+            }
+            
+            #Validamos si el usuario esta habilitado
+            if($userPersona->fecha_baja != null){
+                throw new \yii\web\HttpException(401, 'El usuario se encuentra inhabilitado');
+            }
+            
+            #Registramos el horario de ingreso
+            $usuario->last_login_at = time();
+            $usuario->save();
+            
+            #Registramos la ip de ingreso
+            $userPersona->last_login_ip = Yii::$app->getRequest()->getUserIP();
+            $userPersona->save();
+            
             $resultado = ArrayHelper::merge($userPersona->persona, $resultado);
         }
 

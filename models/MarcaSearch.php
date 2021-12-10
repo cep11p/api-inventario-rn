@@ -41,12 +41,26 @@ class MarcaSearch extends Marca
     */
     public function search($params)
     {
-        $query = Marca::find();        
+        $query = Marca::find();   
+
+        if(!isset($params['pagesize']) || !is_numeric($params['pagesize']) || $params['pagesize']==0){
+            $pagesize = 1000;
+            $paginacion = [
+                "pagesize"=>$pagesize,
+                "page"=>(isset($params['page']) && is_numeric($params['page']))?$params['page']:0
+            ];
+        }else{
+            $pagesize = intval($params['pagesize']);
+            $paginacion = [
+                "pagesize"=>$pagesize,
+                "page"=>(isset($params['page']) && is_numeric($params['page']))?$params['page']:0
+            ];
+        }
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => false
-        ]);
+            'pagination' => $paginacion
+        ]);     
 
         $this->load($params,'');
 
@@ -62,6 +76,17 @@ class MarcaSearch extends Marca
 
         $query->andFilterWhere(['like', 'nombre', $this->nombre]);
 
-        return $dataProvider;
+        $coleccion = array();
+        foreach ($dataProvider->getModels() as $value) {
+            $coleccion[] = $value->toArray();
+        }
+
+        $resultado['pagesize']=$pagesize;            
+        $resultado['pages']=ceil($dataProvider->totalCount/$pagesize);                 
+        $resultado['total_filtrado']=$dataProvider->totalCount;
+        $resultado['resultado']=$coleccion;
+
+
+        return $resultado;
     }
 }

@@ -335,12 +335,11 @@ class ServicioRegistral extends Component implements IServicioRegistral
             
             return $respuesta;
         } catch (\GuzzleHttp\Exception\BadResponseException $e) {
-                \Yii::$app->getModule('audit')->data('catchedexc', \yii\helpers\VarDumper::dumpAsString($e->getResponse()->getBody()));
-                \Yii::error('Error de integración:'.$e->getResponse()->getBody(), $category='apioj');
-                return false;
+            $resultado = json_decode($e->getResponse()->getBody()->getContents());
+            \Yii::$app->getModule('audit')->data('catchedexc', \yii\helpers\VarDumper::dumpAsString($e->getResponse()->getBody()));
+            \Yii::error('Error de integración:'.$e->getResponse()->getBody(), $category='apioj');
+            return $resultado;
         } catch (Exception $e) {
-            print_r($e->getMessage());
-            die();
                 \Yii::$app->getModule('audit')->data('catchedexc', \yii\helpers\VarDumper::dumpAsString($e));
                 \Yii::error('Error inesperado: se produjo:'.$e->getMessage(), $category='apioj');
                 return false;

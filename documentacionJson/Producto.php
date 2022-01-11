@@ -2,7 +2,8 @@
 
 /**** Para mostrar listado ****/
 /**
-* @url http://api.gestor-inventario.local/productos
+* Listado de productos con paginacion dinamica 
+* @url http://api.gestor-inventario.local/productos?pagesize=10
 * @method GET
 * @arrayReturn
  {

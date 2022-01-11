@@ -42,19 +42,22 @@ class ProductoSearch extends Producto
     public function search($params)
     {
         $query = Producto::find();
-        $paginacion = [
-            "pageSize"=>$pagesize = (!isset($params['pagesize']) || !is_numeric($params['pagesize']) || $params['pagesize']==0)?500:intval($params['pagesize']),
-            "page"=>(isset($params['page']) && is_numeric($params['page']))?$params['page']:0
-        ];
+
+        #Paginacion Dinamica
+        if(!isset($params['pagesize']) || !is_numeric($params['pagesize']) || $params['pagesize']==0){
+            $paginacion =false;
+        }else{
+            $pagesize = intval($params['pagesize']);
+            $paginacion = [
+                "pagesize"=>$pagesize,
+                "page"=>(isset($params['page']) && is_numeric($params['page']))?$params['page']:0
+            ];
+        }
+
+        
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'pagination' => $paginacion
-        ]);
-        
-        
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-            'pagination' => false,
+            'pagination' => $paginacion,
             'sort' => [
                 'defaultOrder' => [
                     'nombre' => SORT_ASC,
@@ -86,10 +89,17 @@ class ProductoSearch extends Producto
         foreach ($dataProvider->getModels() as $value) {
             $coleccion[] = $value->toArray();
         }
+
+        #Paginacion Dinamica
+        if(isset($pagesize)){
+            $paginas = ceil($dataProvider->totalCount/$pagesize);           
+            $resultado['pagesize']=$pagesize;            
+            $resultado['pages']=$paginas;            
+        }else{
+            $resultado['pagesize']=0;            
+            $resultado['pages']=0;    
+        }
         
-        $paginas = ceil($dataProvider->totalCount/$pagesize);           
-        $resultado['pagesize']=$pagesize;            
-        $resultado['pages']=$paginas;            
         $resultado['total_filtrado']=$dataProvider->totalCount;
         $resultado['resultado']=$coleccion;
 

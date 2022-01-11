@@ -326,8 +326,7 @@ class ServicioRegistral extends Component implements IServicioRegistral
             $headers = [
                 'Authorization' => 'Bearer ' .$this->crearToken(),
                 'Content-Type'=>'application/json'
-            ];       
-            
+            ];           
             
             $response = $client->request('GET', 'http://registral/api/personas?'.$criterio, ['headers' => $headers]);
             $respuesta = json_decode($response->getBody()->getContents(), true);

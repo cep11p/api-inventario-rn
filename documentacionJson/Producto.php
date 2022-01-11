@@ -5,39 +5,40 @@
 * @url http://api.gestor-inventario.local/productos
 * @method GET
 * @arrayReturn
- * [
-    {
-        "id": 1,
-        "nombre": "Aceite de girasol",
-        "codigo": "A300",
-        "unidad_valor": 1.5,
-        "unidad_medidaid": 3,
-        "marcaid": 1,
-        "categoriaid": 1,
-        "activo": 1,
-        "marca": "Arcor",
-        "unidad_medida": "lt",
-        "producto": "Aceite de girasol, 1.5lt (Arcor)",
-        "categoria": "Alimento"
-    },
-    {
-       ...
-    },
-    {
-        "id": 3,
-        "nombre": "Arroz blanco",
-        "codigo": "A302",
-        "unidad_valor": 1,
-        "unidad_medidaid": 1,
-        "marcaid": 168,
-        "categoriaid": 1,
-        "activo": 1,
-        "marca": "Dos hermanos",
-        "unidad_medida": "kg",
-        "producto": "Arroz blanco, 1kg (Dos hermanos)",
-        "categoria": "Alimento"
-    },
- * ]
+ {
+    "pagesize": 500,
+    "pages": 1,
+    "total_filtrado": 9,
+    "resultado": [
+        {
+            "id": 1,
+            "nombre": "Aceite de girasol",
+            "codigo": "A300",
+            "unidad_valor": 1.5,
+            "unidad_medidaid": 3,
+            "marcaid": 1,
+            "categoriaid": 1,
+            "activo": 1,
+            "marca": "Arcor",
+            "unidad_medida": "lt",
+            "producto": "Aceite de girasol, 1.5lt (Arcor)",
+            "categoria": "Alimento"
+        },
+        {
+            "id": 2,
+            "nombre": "Aceite de girasol",
+            "codigo": "A301",
+            "unidad_valor": 900,
+            "unidad_medidaid": 4,
+            "marcaid": 1,
+            "categoriaid": 1,
+            "activo": 1,
+            "marca": "Arcor",
+            "unidad_medida": "ml",
+            "producto": "Aceite de girasol, 900ml (Arcor)",
+            "categoria": "Alimento"
+        }
+    }
 */
 
 /*****Para crear****

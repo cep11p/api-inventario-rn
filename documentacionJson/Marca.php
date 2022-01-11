@@ -5,28 +5,29 @@
 * @url http://api.gestor-inventario.local/marcas
 * @method GET
 * @arrayReturn
- * [
-    {
-        "id": 230,
-        "nombre": "1 2 3 listo"
-    },
-    {
-        "id": 338,
-        "nombre": "1888"
-    },
-    {
-        "id": 68,
-        "nombre": "3 arroyos"
-    },
-    {
-        "id": 256,
-        "nombre": "3arroyos"
-    },
-    {
-        "id": 289,
-        "nombre": "7up"
-    }
- * ]
+{
+    "pagesize": 1000,
+    "pages": 1,
+    "total_filtrado": 362,
+    "resultado": [
+        {
+            "id": 230,
+            "nombre": "1 2 3 listo"
+        },
+        {
+            "id": 338,
+            "nombre": "1888"
+        },
+        {
+            "id": 68,
+            "nombre": "3 arroyos"
+        },
+        {
+            "id": 256,
+            "nombre": "3arroyos"
+        }
+    ]
+}
 */
 
 /*****Para crear****

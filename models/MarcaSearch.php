@@ -43,12 +43,9 @@ class MarcaSearch extends Marca
     {
         $query = Marca::find();   
 
+        #Paginacion Dinamica
         if(!isset($params['pagesize']) || !is_numeric($params['pagesize']) || $params['pagesize']==0){
-            $pagesize = 1000;
-            $paginacion = [
-                "pagesize"=>$pagesize,
-                "page"=>(isset($params['page']) && is_numeric($params['page']))?$params['page']:0
-            ];
+            $paginacion =false;
         }else{
             $pagesize = intval($params['pagesize']);
             $paginacion = [
@@ -81,8 +78,16 @@ class MarcaSearch extends Marca
             $coleccion[] = $value->toArray();
         }
 
-        $resultado['pagesize']=$pagesize;            
-        $resultado['pages']=ceil($dataProvider->totalCount/$pagesize);                 
+        #Paginacion Dinamica
+        if(isset($pagesize)){
+            $paginas = ceil($dataProvider->totalCount/$pagesize);           
+            $resultado['pagesize']=$pagesize;            
+            $resultado['pages']=$paginas;            
+        }else{
+            $resultado['pagesize']=0;            
+            $resultado['pages']=1;    
+        }
+                    
         $resultado['total_filtrado']=$dataProvider->totalCount;
         $resultado['resultado']=$coleccion;
 

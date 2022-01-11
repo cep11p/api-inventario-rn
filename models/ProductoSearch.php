@@ -97,7 +97,7 @@ class ProductoSearch extends Producto
             $resultado['pages']=$paginas;            
         }else{
             $resultado['pagesize']=0;            
-            $resultado['pages']=0;    
+            $resultado['pages']=1;    
         }
         
         $resultado['total_filtrado']=$dataProvider->totalCount;

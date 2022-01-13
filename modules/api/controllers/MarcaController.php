@@ -100,7 +100,7 @@ class MarcaController extends ActiveController{
         $model = Marca::findOne(['id'=>$id]);
         
         if($model==null){
-            throw new Exception(json_encode('La Marca no existe'));
+            throw new Exception(json_encode("La Marca $id no existe"));
         }
         $transaction = Yii::$app->db->beginTransaction();
         try {
@@ -113,7 +113,7 @@ class MarcaController extends ActiveController{
 
             $transaction->commit();
             
-            $resultado['message']='Se registra una nueva Marca';
+            $resultado['message']='Se modifica una Marca';
             $resultado['id']=$model->id;
             
             return  $resultado;

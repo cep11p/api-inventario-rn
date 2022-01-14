@@ -2,7 +2,7 @@
 
 /**** Para mostrar listado ****/
 /**
-* @url http://api.gestor-inventario.local/marcas
+* @url http://api.inventario.local/marcas
 * @method GET
 * @arrayReturn
 {
@@ -31,7 +31,7 @@
 */
 
 /*****Para crear****
-* @url http://api.gestor-inventario.local/marcas 
+* @url http://api.inventario.local/marcas 
 * @method POST
 * @param arrayJson
  * {
@@ -40,7 +40,7 @@
 **/
 
 /**** Para modificar*****
-* @url http://api.gestor-inventario.local/marcas/{$id} 
+* @url http://api.inventario.local/marcas/{$id} 
 * @method PUT
 * @param arrayJson
  * {
@@ -49,7 +49,7 @@
 **/
 
 /****** Para visualizar*****
-* @url http://api.gestor-inventario.local/marcas/{$id} 
+* @url http://api.inventario.local/marcas/{$id} 
 * @method GET
 * @return arrayJson
  * {
@@ -59,7 +59,10 @@
 */
 
 /****** Para borrar una localidad *****
-* @url http://api.gestor-inventario.local/marcas/{$id} 
+* @url http://api.inventario.local/marcas/{$id} 
 * @method Delete
 * @return arrayJson
+    {
+        "message": "Se borra una Marca"
+    }
 */

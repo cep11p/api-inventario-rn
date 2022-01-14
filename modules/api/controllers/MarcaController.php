@@ -124,5 +124,32 @@ class MarcaController extends ActiveController{
             throw new \yii\web\HttpException(400, $mensaje);
         }
     }
+
+    public function actionDelete($id){
+        $model = Marca::findOne(['id'=>$id]);
+        
+        if($model==null){
+            throw new Exception(json_encode("La Marca $id no existe"));
+        }
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            
+            
+            if(!$model->delete()){
+                throw new Exception(json_encode($model->getErrors()));
+            }
+
+            $transaction->commit();
+            
+            $resultado['message']='Se borra una Marca';
+            
+            return  $resultado;
+           
+        }catch (Exception $exc) {
+            $transaction->rollBack();
+            $mensaje =$exc->getMessage();
+            throw new \yii\web\HttpException(400, $mensaje);
+        }
+    }
         
 }

@@ -31,4 +31,10 @@ class Categoria extends BaseCategoria
             ]
         );
     }
+
+    public function setAttributesCustom($values, $safeOnly = true) {
+        parent::setAttributes($values, $safeOnly);
+        $this->nombre = ucfirst(strtolower($this->nombre));
+    }
+
 }

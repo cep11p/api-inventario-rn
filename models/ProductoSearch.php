@@ -95,13 +95,11 @@ class ProductoSearch extends Producto
             $paginas = ceil($dataProvider->totalCount/$pagesize);           
             $resultado['pagesize']=$pagesize;            
             $resultado['pages']=$paginas;            
+            $resultado['total_filtrado']=$dataProvider->totalCount;
+            $resultado['resultado']=$coleccion;
         }else{
-            $resultado['pagesize']=0;            
-            $resultado['pages']=1;    
+            $resultado = $coleccion;
         }
-        
-        $resultado['total_filtrado']=$dataProvider->totalCount;
-        $resultado['resultado']=$coleccion;
 
         return $resultado;
     }

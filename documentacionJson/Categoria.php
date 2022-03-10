@@ -1,32 +1,91 @@
 <?php
 
-/**** Para mostrar listado ****/
-/**
-* @url http://api.gestor-inventario.local/categorias
+/** Para mostrar listado
+* @url http://inventario.local/categorias
 * @method GET
-* @arrayReturn
+* @arrayReturn SIN PAGINACION
+    [
+        {
+            "id": 230,
+            "nombre": "1 2 3 listo"
+        },
+        {
+            "id": 338,
+            "nombre": "1888"
+        },
+        {
+            "id": 68,
+            "nombre": "3 arroyos"
+        }
+    ]
+* @arrayReturn SIN PAGINACION
+{
+    "pagesize": 3,
+    "pages": 121,
+    "total_filtrado": 361,
+    "resultado": [
+        {
+            "id": 230,
+            "nombre": "1 2 3 listo"
+        },
+        {
+            "id": 338,
+            "nombre": "1888"
+        },
+        {
+            "id": 68,
+            "nombre": "3 arroyos"
+        }
+    ]
+}
 */
 
-/*****Para crear****
-* @url http://api.gestor-inventario.local/categorias 
+/** Para crear
+* @url http://inventario.local/categorias 
 * @method POST
 * @param arrayJson
+{    
+	"nombre" : "micategoria"        
+}
+
+* @return
+{
+    "message": "Se registra una nueva Categoria",
+    "id": 4
+}
 **/
 
-/**** Para modificar*****
-* @url http://api.gestor-inventario.local/categorias/{$id} 
+/** Para modificar
+* @url http://inventario.local/categorias/{$id} 
 * @method PUT
 * @param arrayJson
+{    
+	"nombre" : "micategoria"        
+}
+
+* @return
+{
+    "message": "Se registra una nueva Categoria",
+    "id": 4
+}
 **/
 
-/****** Para visualizar*****
-* @url http://api.gestor-inventario.local/categorias/{$id} 
+/** Para visualizar
+* @url http://inventario.local/categorias/{$id} 
 * @method GET
 * @return arrayJson
+{
+    "id": 1,
+    "nombre": "Alimento"
+}
 */
 
-/****** Para borrar una localidad *****
-* @url http://api.gestor-inventario.local/categorias/{$id} 
-* @method Delete
+/** Se habilita o se inhabilita. Borrado logico
+* @url http://inventario.local/categorias/set-activo/{$id} 
+* @method PUT
+* @param activo interger or bool opcional
 * @return arrayJson
+    {
+	    "activo": 0
+    }
 */

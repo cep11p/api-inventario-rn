@@ -81,7 +81,11 @@ $config = [
                 ],
                 [   
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => 'api/categoria'
+                    'controller' => 'api/categoria',
+                    'extraPatterns' => [
+                        'PUT set-activo/{id}' => 'set-activo',
+                        'OPTIONS set-activo/{id}' => 'set-activo',
+                    ],
                 ],
                 [   
                     'class' => 'yii\rest\UrlRule',

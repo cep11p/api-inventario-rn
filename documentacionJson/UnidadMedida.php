@@ -2,7 +2,7 @@
 
 /**** Para mostrar listado ****/
 /**
-* @url http://api.inventario.local/unidad-medidas
+* @url http://inventario.local/unidad-medidas
 * @method GET
 * @arrayReturn
 [
@@ -40,7 +40,7 @@
 */
 
 /** Para crear
-* @url http://api.inventario.local/unidad-medidas 
+* @url http://inventario.local/unidad-medidas 
 * @method POST
 * @param arrayJson
 {
@@ -50,7 +50,7 @@
 **/
 
 /** Para modificar
-* @url http://api.inventario.local/unidad-medidas/{$id} 
+* @url http://inventario.local/unidad-medidas/{$id} 
 * @method PUT
 * @param arrayJson
 {
@@ -60,7 +60,7 @@
 **/
 
 /** Para visualizar
-* @url http://api.inventario.local/unidad-medidas/{$id} 
+* @url http://inventario.local/unidad-medidas/{$id} 
 * @method GET
 * @return arrayJson
 {
@@ -71,7 +71,7 @@
 */
 
 /** Se habilita o se inhabilita. Borrado logico
-* @url http://api.inventario.local/productos/set-activo/{$id} 
+* @url http://inventario.local/unidad-medidas/set-activo/{$id} 
 * @method PUT
 * @param activo interger or bool opcional
 * @return arrayJson

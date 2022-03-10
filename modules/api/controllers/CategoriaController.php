@@ -8,6 +8,7 @@ use Yii;
 use yii\base\Exception;
 
 use app\models\Categoria;
+use app\models\Marca;
 
 class CategoriaController extends ActiveController{
     
@@ -124,23 +125,22 @@ class CategoriaController extends ActiveController{
         }
     }
 
-    public function actionDelete($id){
-        $model = Categoria::findOne(['id'=>$id]);
-        
+    public function actionSetActivo($id){
+        $param = \Yii::$app->request->post();
+        $model = Marca::findOne(['id'=>$id]);
+
         if($model==null){
-            throw new Exception(json_encode("La Categoria $id no existe"));
-        }
+            throw new Exception(json_encode('La unidad de medida no existe'));
+        }        
+        
         $transaction = Yii::$app->db->beginTransaction();
-        try {
-            
-            
-            if(!$model->delete()){
-                throw new Exception(json_encode($model->getErrors()));
-            }
+        try {            
+            $model->setActivo($param);
 
             $transaction->commit();
             
-            $resultado['message']='Se borra una Categoria';
+            $resultado['message']='Se modifica la unidad de medida';
+            $resultado['id']=$model->id;
             
             return  $resultado;
            
@@ -149,5 +149,7 @@ class CategoriaController extends ActiveController{
             $mensaje =$exc->getMessage();
             throw new \yii\web\HttpException(400, $mensaje);
         }
-    }       
+        
+        return $resultado;
+    }    
 }

@@ -40,7 +40,7 @@ class Producto extends BaseProducto
     }
     
     /**
-     * Seteamos el atributo activo de un producto
+     * Seteamos el atributo activo de un modelo
      * @param array $param
      * @return boolean
      * @throws Exception

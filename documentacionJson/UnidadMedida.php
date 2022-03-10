@@ -2,7 +2,7 @@
 
 /**** Para mostrar listado ****/
 /**
-* @url http://api.gestor-inventario.local/unidad-medidas
+* @url http://api.inventario.local/unidad-medidas
 * @method GET
 * @arrayReturn
 [
@@ -39,8 +39,8 @@
 ]
 */
 
-/*****Para crear****
-* @url http://api.gestor-inventario.local/unidad-medidas 
+/** Para crear
+* @url http://api.inventario.local/unidad-medidas 
 * @method POST
 * @param arrayJson
 {
@@ -49,8 +49,8 @@
 }
 **/
 
-/**** Para modificar*****
-* @url http://api.gestor-inventario.local/unidad-medidas/{$id} 
+/** Para modificar
+* @url http://api.inventario.local/unidad-medidas/{$id} 
 * @method PUT
 * @param arrayJson
 {
@@ -59,8 +59,8 @@
 }
 **/
 
-/****** Para visualizar*****
-* @url http://api.gestor-inventario.local/unidad-medidas/{$id} 
+/** Para visualizar
+* @url http://api.inventario.local/unidad-medidas/{$id} 
 * @method GET
 * @return arrayJson
 {
@@ -68,4 +68,14 @@
     "nombre": "Centimetros cúbicos modificar",
     "simbolo": "cm3"
 }
+*/
+
+/** Se habilita o se inhabilita. Borrado logico
+* @url http://api.inventario.local/productos/set-activo/{$id} 
+* @method PUT
+* @param activo interger or bool opcional
+* @return arrayJson
+    {
+	    "activo": 0
+    }
 */

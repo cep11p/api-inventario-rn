@@ -2,8 +2,10 @@
 
 namespace app\models;
 
+use app\components\Help;
 use Yii;
 use \app\models\base\UnidadMedida as BaseUnidadMedida;
+use Exception;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -30,5 +32,26 @@ class UnidadMedida extends BaseUnidadMedida
                 # custom validation rules
             ]
         );
+    }
+
+    /**
+     * Seteamos el atributo activo del modelo
+     * @param array $param['activo]
+     * @return boolean
+     * @throws Exception
+     */
+    public function setActivo($param) {
+        $activo = false;
+        if(isset($param['activo'])){
+            $activo = \app\components\Help::setBoolean($param['activo']);        
+        }
+        
+        $this->activo = \app\components\Help::booleanToInt($activo);
+        
+        if(!$this->save()){
+            throw new Exception(Help::ArrayErrorsToString($this->getErrors()));
+        }
+        
+        return true;
     }
 }

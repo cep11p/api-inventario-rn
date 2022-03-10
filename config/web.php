@@ -135,7 +135,11 @@ $config = [
                 ],
                 [   
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => 'api/unidad-medida'
+                    'controller' => 'api/unidad-medida',
+                    'extraPatterns' => [
+                        'PUT set-activo/{id}' => 'set-activo',
+                        'OPTIONS set-activo/{id}' => 'set-activo',
+                    ],
                 ],
                 [   #Permiso
                     'class' => 'yii\rest\UrlRule',

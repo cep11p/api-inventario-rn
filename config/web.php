@@ -135,7 +135,11 @@ $config = [
                 ],
                 [   
                     'class' => 'yii\rest\UrlRule',
-                    'controller' => 'api/proveedor'
+                    'controller' => 'api/proveedor',
+                    'extraPatterns' => [
+                        'PUT set-activo/{id}' => 'set-activo',
+                        'OPTIONS set-activo/{id}' => 'set-activo',
+                    ],
                 ],
                 [   
                     'class' => 'yii\rest\UrlRule',

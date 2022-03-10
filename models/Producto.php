@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\components\Help;
 use Yii;
 use \app\models\base\Producto as BaseProducto;
 use yii\helpers\ArrayHelper;
@@ -53,7 +54,7 @@ class Producto extends BaseProducto
         $this->activo = \app\components\Help::booleanToInt($activo);
         
         if(!$this->save()){
-            throw new Exception(json_encode($this->getErrors()));
+            throw new Exception(Help::ArrayErrorsToString($this->getErrors()));
         }
         
         return true;

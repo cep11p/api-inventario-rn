@@ -51,7 +51,7 @@ class ProductoController extends ActiveController{
     {
         $actions = parent::actions();
         unset($actions['create']);
-//        unset($actions['update']);
+        unset($actions['update']);
 //        unset($actions['delete']);
         $actions['index']['prepareDataProvider'] = [$this, 'prepareDataProvider'];
         return $actions;
@@ -89,6 +89,37 @@ class ProductoController extends ActiveController{
             $transaction->commit();
             
             $resultado['message']='Se registra un nuevo Producto';
+            $resultado['id']=$model->id;
+            
+            return  $resultado;
+           
+        }catch (Exception $exc) {
+            $transaction->rollBack();
+            $mensaje =$exc->getMessage();
+            throw new \yii\web\HttpException(400, $mensaje);
+        }
+    }
+    
+    public function actionUpdate($id) 
+    {          
+        $param = Yii::$app->request->post();
+        $model = Producto::findOne(['id'=>$id]);
+        
+        if($model==null){
+            throw new Exception(json_encode("El producto $id no existe"));
+        }
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            
+            $model->setAttributes($param);
+            
+            if(!$model->save()){
+                throw new Exception(json_encode($model->getErrors()));
+            }
+
+            $transaction->commit();
+            
+            $resultado['message']='Se modifica una producto';
             $resultado['id']=$model->id;
             
             return  $resultado;

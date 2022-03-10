@@ -12,14 +12,14 @@ use Yii;
  * @property integer $id
  * @property string $nombre
  * @property string $codigo
- * @property string $unidad_valor
+ * @property double $unidad_valor
  * @property integer $unidad_medidaid
  * @property integer $marcaid
  * @property integer $categoriaid
  * @property integer $activo
  *
- * @property \app\models\Inventario[] $inventarios
  * @property \app\models\Categoria $categoria
+ * @property \app\models\Inventario[] $inventarios
  * @property \app\models\Marca $marca
  * @property \app\models\UnidadMedida $unidadMedida
  * @property string $aliasModel
@@ -44,10 +44,10 @@ abstract class Producto extends \yii\db\ActiveRecord
     {
         return [
             [['nombre', 'unidad_medidaid', 'marcaid', 'categoriaid'], 'required'],
+            [['unidad_valor'], 'number'],
             [['unidad_medidaid', 'marcaid', 'categoriaid', 'activo'], 'integer'],
             [['nombre'], 'string', 'max' => 200],
             [['codigo'], 'string', 'max' => 45],
-            [['unidad_valor'], 'string', 'max' => 4],
             [['codigo'], 'unique'],
             [['categoriaid'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\Categoria::className(), 'targetAttribute' => ['categoriaid' => 'id']],
             [['marcaid'], 'exist', 'skipOnError' => true, 'targetClass' => \app\models\Marca::className(), 'targetAttribute' => ['marcaid' => 'id']],
@@ -75,17 +75,17 @@ abstract class Producto extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getInventarios()
+    public function getCategoria()
     {
-        return $this->hasMany(\app\models\Inventario::className(), ['productoid' => 'id']);
+        return $this->hasOne(\app\models\Categoria::className(), ['id' => 'categoriaid']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCategoria()
+    public function getInventarios()
     {
-        return $this->hasOne(\app\models\Categoria::className(), ['id' => 'categoriaid']);
+        return $this->hasMany(\app\models\Inventario::className(), ['productoid' => 'id']);
     }
 
     /**

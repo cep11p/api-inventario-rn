@@ -1,7 +1,7 @@
 <?php
 
 /** Para mostrar listado
-* @url http://inventario.local/categorias
+* @url http://inventario.local/api/categorias
 * @method GET
 * @arrayReturn SIN PAGINACION
     [
@@ -41,7 +41,7 @@
 */
 
 /** Para crear
-* @url http://inventario.local/categorias 
+* @url http://inventario.local/api/categorias 
 * @method POST
 * @param arrayJson
 {    
@@ -56,7 +56,7 @@
 **/
 
 /** Para modificar
-* @url http://inventario.local/categorias/{$id} 
+* @url http://inventario.local/api/categorias/{$id} 
 * @method PUT
 * @param arrayJson
 {    
@@ -71,7 +71,7 @@
 **/
 
 /** Para visualizar
-* @url http://inventario.local/categorias/{$id} 
+* @url http://inventario.local/api/categorias/{$id} 
 * @method GET
 * @return arrayJson
 {
@@ -81,7 +81,7 @@
 */
 
 /** Se habilita o se inhabilita. Borrado logico
-* @url http://inventario.local/categorias/set-activo/{$id} 
+* @url http://inventario.local/api/categorias/set-activo/{$id} 
 * @method PUT
 * @param activo interger or bool opcional
 * @return arrayJson

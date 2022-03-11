@@ -2,9 +2,29 @@
 
 /**** Para mostrar listado ****/
 /**
-* @url http://api.inventario.local/categorias
+* @url http://inventario.local/api/marcas
 * @method GET
-* @arrayReturn
+* @arrayReturn SIN PAGINACION
+    [
+        {
+            "id": 230,
+            "nombre": "1 2 3 listo"
+        },
+        {
+            "id": 338,
+            "nombre": "1888"
+        },
+        {
+            "id": 68,
+            "nombre": "3 arroyos"
+        },
+        {
+            "id": 256,
+            "nombre": "3arroyos"
+        }
+    ]
+
+* @arrayReturn CON PAGINACION
 {
     "pagesize": 1000,
     "pages": 1,
@@ -30,8 +50,8 @@
 }
 */
 
-/*****Para crear****
-* @url http://api.inventario.local/categorias 
+/** Para crear
+* @url http://inventario.local/api/marcas
 * @method POST
 * @param arrayJson
  * {
@@ -39,8 +59,8 @@
     }
 **/
 
-/**** Para modificar*****
-* @url http://api.inventario.local/categorias/{$id} 
+/** Para modificar
+* @url http://inventario.local/api/marcas/{$id} 
 * @method PUT
 * @param arrayJson
  * {
@@ -48,8 +68,8 @@
     }
 **/
 
-/****** Para visualizar*****
-* @url http://api.inventario.local/categorias/{$id} 
+/** Para visualizar
+* @url http://inventario.local/api/marcas/{$id} 
 * @method GET
 * @return arrayJson
  * {
@@ -58,9 +78,13 @@
     }
 */
 
-/****** Para borrar una localidad *****
-* @url http://api.inventario.local/categorias/{$id} 
-* @method Delete
+/** Para borrar una localidad
+* @url http://inventario.local/api/marcas/set-activo/{$id} 
+* @method PUT
+* @param json
+    {
+        "activo" : 0
+    }
 * @return arrayJson
     {
         "message": "Se borra una Marca"

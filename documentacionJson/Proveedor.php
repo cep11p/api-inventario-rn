@@ -2,7 +2,7 @@
 
 /**** Para mostrar listado ****/
 /**
-* @url http://inventario.local/proveedor
+* @url http://inventario.local/api/proveedor
 * @method GET
 * @arrayReturn
 * @arrayReturn
@@ -49,7 +49,7 @@
 */
 
 /** Para crear
-* @url http://inventario.local/proveedor 
+* @url http://inventario.local/api/proveedor 
 * @method POST
 * @param arrayJson
     {
@@ -64,7 +64,7 @@
 **/
 
 /** Para modificar
-* @url http://inventario.local/proveedor/{$id} 
+* @url http://inventario.local/api/proveedor/{$id} 
 * @method PUT
 * @param arrayJson
     {
@@ -79,7 +79,7 @@
 **/
 
 /** Para visualizar
-* @url http://inventario.local/proveedor/{$id} 
+* @url http://inventario.local/api/proveedor/{$id} 
 * @method GET
 * @return arrayJson
     {
@@ -90,7 +90,7 @@
 */
 
 /** Se habilita o se inhabilita. Borrado logico
-* @url http://inventario.local/proveedor/set-activo/{$id} 
+* @url http://inventario.local/api/proveedor/set-activo/{$id} 
 * @method PUT
 * @param activo interger or bool opcional
 * @return arrayJson

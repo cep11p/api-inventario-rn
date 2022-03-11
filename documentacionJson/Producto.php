@@ -2,47 +2,78 @@
 
 /** Para mostrar listado 
  * Listado de productos con paginacion dinamica 
- * @url http://api.inventario.local/productos?pagesize=10
+ * @url http://inventario.local/api/productos?pagesize=10
  * @method GET
- * @arrayReturn
- {
-     "pagesize": 500,
-     "pages": 1,
-     "total_filtrado": 9,
-     "resultado": [
-         {
-             "id": 1,
-             "nombre": "Aceite de girasol",
-             "codigo": "A300",
-             "unidad_valor": 1.5,
-             "unidad_medidaid": 3,
-             "marcaid": 1,
-             "categoriaid": 1,
-             "activo": 1,
-             "marca": "Arcor",
-             "unidad_medida": "lt",
-             "producto": "Aceite de girasol, 1.5lt (Arcor)",
-             "categoria": "Alimento"
-         },
-         {
-             "id": 2,
-             "nombre": "Aceite de girasol",
-             "codigo": "A301",
-             "unidad_valor": 900,
-             "unidad_medidaid": 4,
-             "marcaid": 1,
-             "categoriaid": 1,
-             "activo": 1,
-             "marca": "Arcor",
-             "unidad_medida": "ml",
-             "producto": "Aceite de girasol, 900ml (Arcor)",
-             "categoria": "Alimento"
-         }
-     }
+  * @arrayReturn Sin Paginacion
+    [
+        {
+            "id": 1,
+            "nombre": "Aceite de girasol",
+            "codigo": "A300",
+            "unidad_valor": 1.5,
+            "unidad_medidaid": 3,
+            "marcaid": 1,
+            "categoriaid": 1,
+            "activo": 1,
+            "marca": "Arcor",
+            "unidad_medida": "lt",
+            "producto": "Aceite de girasol, 1.5lt (Arcor)",
+            "categoria": "Alimento"
+        },
+        {
+            "id": 2,
+            "nombre": "Aceite de girasol",
+            "codigo": "A301",
+            "unidad_valor": 900,
+            "unidad_medidaid": 4,
+            "marcaid": 1,
+            "categoriaid": 1,
+            "activo": 1,
+            "marca": "Arcor",
+            "unidad_medida": "ml",
+            "producto": "Aceite de girasol, 900ml (Arcor)",
+            "categoria": "Alimento"
+        }
+    ]
+ * @arrayReturn Con Paginacion
+    {
+        "pagesize": 500,
+        "pages": 1,
+        "total_filtrado": 9,
+        "resultado": [
+            {
+                "id": 1,
+                "nombre": "Aceite de girasol",
+                "codigo": "A300",
+                "unidad_valor": 1.5,
+                "unidad_medidaid": 3,
+                "marcaid": 1,
+                "categoriaid": 1,
+                "activo": 1,
+                "marca": "Arcor",
+                "unidad_medida": "lt",
+                "producto": "Aceite de girasol, 1.5lt (Arcor)",
+                "categoria": "Alimento"
+            },
+            {
+                "id": 2,
+                "nombre": "Aceite de girasol",
+                "codigo": "A301",
+                "unidad_valor": 900,
+                "unidad_medidaid": 4,
+                "marcaid": 1,
+                "categoriaid": 1,
+                "activo": 1,
+                "marca": "Arcor",
+                "unidad_medida": "ml",
+                "producto": "Aceite de girasol, 900ml (Arcor)",
+                "categoria": "Alimento"
+            }
+    }
 */
 
 /** Para crear
-* @url http://api.inventario.local/productos 
+* @url http://inventario.local/api/productos 
 * @method POST
 * @param arrayJson
     {
@@ -56,7 +87,7 @@
 **/
 
 /** Para modificar
-* @url http://api.inventario.local/productos/{$id} 
+* @url http://inventario.local/api/productos/{$id} 
 * @method PUT
 * @param arrayJson
     {
@@ -73,7 +104,7 @@
 **/
 
 /** Para visualizar
-* @url http://api.inventario.local/productos/{$id} 
+* @url http://inventario.local/api/productos/{$id} 
 * @method GET
 * @return arrayJson
     {
@@ -91,7 +122,7 @@
 */
 
 /** Para borrar producto logicamente
-* @url http://api.inventario.local/productos/set-activo/{$id} 
+* @url http://inventario.local/api/productos/set-activo/{$id} 
 * @method PUT
 * @return arrayJson
     {

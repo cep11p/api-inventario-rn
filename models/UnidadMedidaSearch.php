@@ -72,8 +72,11 @@ class UnidadMedidaSearch extends UnidadMedida
             'activo' => ($paginacion==false)?1:$this->activo,
         ]);
 
-        $query->andFilterWhere(['like', 'nombre', $this->nombre])
-            ->andFilterWhere(['like', 'simbolo', $this->simbolo]);
+        #global param
+        if(isset($params['global_param']) && !empty($params['global_param'])){
+            $query->andFilterWhere(['like', 'nombre', $params['global_param']])
+            ->orFilterWhere(['like', 'simbolo', $params['global_param']]);
+        }
 
         $coleccion = array();
         foreach ($dataProvider->getModels() as $value) {

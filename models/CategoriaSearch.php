@@ -67,6 +67,11 @@ class CategoriaSearch extends Categoria
             return $dataProvider;
         }
 
+        #global param
+        if(isset($params['global_param']) && !empty($params['global_param'])){
+            $query->andFilterWhere(['like', 'nombre', $params['global_param']]);
+        }
+
         $query->andFilterWhere([
             'id' => $this->id,
             'activo' => ($paginacion==false)?1:$this->activo,

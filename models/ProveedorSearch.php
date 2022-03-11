@@ -72,8 +72,11 @@ class ProveedorSearch extends Proveedor
             'activo' => ($paginacion==false)?1:$this->activo,
         ]);
 
-        $query->andFilterWhere(['like', 'nombre', $this->nombre])
-            ->andFilterWhere(['like', 'cuit', $this->cuit]);
+        #global param
+        if(isset($params['global_param']) && !empty($params['global_param'])){
+            $query->andFilterWhere(['like', 'nombre', $params['global_param']])
+            ->orFilterWhere(['like', 'cuit', $params['global_param']]);
+        }
 
         $coleccion = array();
         foreach ($dataProvider->getModels() as $value) {

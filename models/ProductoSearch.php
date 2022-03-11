@@ -81,9 +81,10 @@ class ProductoSearch extends Producto
             'activo' => ($paginacion==false)?1:$this->activo,
         ]);
 
-        $query->andFilterWhere(['like', 'nombre', $this->nombre])
-            ->andFilterWhere(['like', 'codigo', $this->codigo])
-            ->andFilterWhere(['like', 'unidad_valor', $this->unidad_valor]);
+        #global param
+        if(isset($params['global_param']) && !empty($params['global_param'])){
+            $query->andFilterWhere(['like', 'nombre', $params['global_param']]);
+        }
 
         $coleccion = array();
         foreach ($dataProvider->getModels() as $value) {

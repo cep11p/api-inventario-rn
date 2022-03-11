@@ -11,6 +11,7 @@ use Yii;
  *
  * @property integer $id
  * @property string $nombre
+ * @property integer $activo
  *
  * @property \app\models\Producto[] $productos
  * @property string $aliasModel
@@ -35,6 +36,7 @@ abstract class Marca extends \yii\db\ActiveRecord
     {
         return [
             [['nombre'], 'required'],
+            [['activo'], 'integer'],
             [['nombre'], 'string', 'max' => 100],
             [['nombre'], 'unique']
         ];
@@ -48,6 +50,7 @@ abstract class Marca extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'nombre' => 'Nombre',
+            'activo' => 'Activo',
         ];
     }
 

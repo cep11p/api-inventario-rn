@@ -78,7 +78,7 @@ class ProductoSearch extends Producto
             'unidad_medidaid' => $this->unidad_medidaid,
             'marcaid' => $this->marcaid,
             'categoriaid' => $this->categoriaid,
-            'activo' => 1,
+            'activo' => ($paginacion==false)?1:$this->activo,
         ]);
 
         $query->andFilterWhere(['like', 'nombre', $this->nombre])

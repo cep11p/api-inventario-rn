@@ -12,6 +12,7 @@ use Yii;
  * @property integer $id
  * @property string $nombre
  * @property string $simbolo
+ * @property integer $activo
  *
  * @property \app\models\Producto[] $productos
  * @property string $aliasModel
@@ -36,6 +37,7 @@ abstract class UnidadMedida extends \yii\db\ActiveRecord
     {
         return [
             [['nombre'], 'required'],
+            [['activo'], 'integer'],
             [['nombre', 'simbolo'], 'string', 'max' => 45]
         ];
     }
@@ -49,6 +51,7 @@ abstract class UnidadMedida extends \yii\db\ActiveRecord
             'id' => 'ID',
             'nombre' => 'Nombre',
             'simbolo' => 'Simbolo',
+            'activo' => 'Activo',
         ];
     }
 

@@ -18,7 +18,7 @@ class UnidadMedidaSearch extends UnidadMedida
     public function rules()
     {
         return [
-            [['id'], 'integer'],
+            [['id','activo'], 'integer'],
             [['nombre', 'simbolo'], 'safe'],
         ];
     }
@@ -69,6 +69,7 @@ class UnidadMedidaSearch extends UnidadMedida
 
         $query->andFilterWhere([
             'id' => $this->id,
+            'activo' => ($paginacion==false)?1:$this->activo,
         ]);
 
         $query->andFilterWhere(['like', 'nombre', $this->nombre])

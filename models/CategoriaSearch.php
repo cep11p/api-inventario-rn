@@ -18,7 +18,7 @@ class CategoriaSearch extends Categoria
     public function rules()
     {
         return [
-            [['id'], 'integer'],
+            [['id','activo'], 'integer'],
             [['nombre'], 'safe'],
         ];
     }
@@ -69,6 +69,7 @@ class CategoriaSearch extends Categoria
 
         $query->andFilterWhere([
             'id' => $this->id,
+            'activo' => ($paginacion==false)?1:$this->activo,
         ]);
 
         $query->andFilterWhere(['like', 'nombre', $this->nombre]);

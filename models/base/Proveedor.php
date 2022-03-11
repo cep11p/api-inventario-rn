@@ -12,6 +12,7 @@ use Yii;
  * @property integer $id
  * @property string $nombre
  * @property string $cuit
+ * @property integer $activo
  *
  * @property \app\models\Comprobante[] $comprobantes
  * @property string $aliasModel
@@ -36,6 +37,7 @@ abstract class Proveedor extends \yii\db\ActiveRecord
     {
         return [
             [['nombre'], 'required'],
+            [['activo'], 'integer'],
             [['nombre'], 'string', 'max' => 100],
             [['cuit'], 'string', 'max' => 45]
         ];
@@ -50,6 +52,7 @@ abstract class Proveedor extends \yii\db\ActiveRecord
             'id' => 'ID',
             'nombre' => 'Nombre',
             'cuit' => 'Cuit',
+            'activo' => 'Activo',
         ];
     }
 

@@ -18,7 +18,7 @@ class MarcaSearch extends Marca
     public function rules()
     {
         return [
-            [['id'], 'integer'],
+            [['id','activo'], 'integer'],
             [['nombre'], 'safe'],
         ];
     }
@@ -69,6 +69,7 @@ class MarcaSearch extends Marca
 
         $query->andFilterWhere([
             'id' => $this->id,
+            'activo' => ($paginacion==false)?1:$this->activo,
         ]);
 
         $query->andFilterWhere(['like', 'nombre', $this->nombre]);

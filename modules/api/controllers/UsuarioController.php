@@ -2,6 +2,7 @@
 
 namespace app\modules\api\controllers;
 
+use app\components\ServicioInteroperable;
 use app\components\VinculoInteroperableHelp;
 use app\models\User;
 use app\models\UserPersona;
@@ -17,9 +18,13 @@ use yii\helpers\ArrayHelper;
 class UsuarioController extends ActiveController
 {
     public $modelClass = 'app\models\ApiUser';
+    const CONTROLLER_NAME = 'usuario';
+    const SERVICIO_NAME = 'user';
     
     /** @var Finder */
     protected $finder;
+
+    
 
     /**
      * @param string $id
@@ -150,67 +155,11 @@ class UsuarioController extends ActiveController
      *
      * @return Response|array
      */
-    public function actionLogin()
-    {
-        $parametros = Yii::$app->getRequest()->getBodyParams();
-
-        #Intancia de ActiveRecord
-        $usuario = $this->finder->findUserByUsernameOrEmail($parametros['username']);       
-        
-        if(!($usuario !== null && Password::validate($parametros['password_hash'],$usuario->password_hash))){
-            throw new \yii\web\HttpException(401, 'usuario o contraseña inválido');
-        }
-
-        #Obtenemos el Rol
-        $rol = '';
-        $roles = \Yii::$app->authManager->getRolesByUser($usuario->id);
-        foreach($roles as $value){
-            $rol = $value->name;
-            break;
-        }
-
-        #Generamos el Token
-        $payload = [
-            'exp'=>time()+3600*8,
-            'usuario'=>$usuario->username,
-            'uid' => $usuario->id  
-        ];
-        $token = \Firebase\JWT\JWT::encode($payload, \Yii::$app->params['JWT_SECRET']);
-
-        
-        
-        #Seteamos principales datos del resultado
-        $resultado = [
-            'access_token' => $token,
-            'username' => $usuario->username,
-            'rol' => $rol
-        ];
-
-        #vinculamos persona solo si el usuario tiene el rol "Usuario" o "Soporte"
-        if($rol == 'usuario' || $rol == 'soporte'){
-            #Buscamos la tabla relacional user_persona
-            $userPersona = UserPersona::findOne(['userid'=>$usuario->id]);
-            
-            #Chequeamos si exite el userpersona
-            if($userPersona == null){
-                throw new \yii\web\HttpException(401, 'El usuario '.$usuario->id.' tiene una inconsitencia con la tabla user_persona');
-            }
-            
-            #Validamos si el usuario esta habilitado
-            if($userPersona->fecha_baja != null){
-                throw new \yii\web\HttpException(401, 'El usuario se encuentra inhabilitado');
-            }
-            
-            #Registramos el horario de ingreso
-            $usuario->last_login_at = time();
-            $usuario->save();
-            
-            #Registramos la ip de ingreso
-            $userPersona->last_login_ip = Yii::$app->getRequest()->getUserIP();
-            $userPersona->save();
-            
-            $resultado = ArrayHelper::merge($userPersona->persona, $resultado);
-        }
+    public function actionLogin(){
+        $resultado['estado']=false;
+        $param = Yii::$app->request->post();
+        $servicioInteroperable = new ServicioInteroperable();
+        $resultado = $servicioInteroperable->login(self::SERVICIO_NAME,self::CONTROLLER_NAME,$param);
 
         return $resultado;
     }

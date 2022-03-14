@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\components\ServicioInteroperable;
 use app\models\ApiUser;
 use Exception;
 use Yii;
@@ -35,6 +36,23 @@ class User extends ApiUser
             ]
         );
     }
+
+     /**
+     * Se busca el usuario mediante una interoperabilidad
+     * @param int $id
+     * @return User
+     */
+    static function findByUid($id){
+        $servicioInteroperable = new ServicioInteroperable();
+        $resultado = $servicioInteroperable->viewRegistro('user','usuario',['id' => $id]);
+
+        $model = new self();
+        $model->setAttributes($resultado);
+        $model->id = $resultado['id'];
+
+        return $model;
+    }    
+
     
     static function limpiarPermisos($params){
 

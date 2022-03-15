@@ -305,7 +305,6 @@ class ServicioInteroperable extends Component
             \Yii::error(json_encode($param));
             $headers = [
                 'Content-Type'=>'application/json',
-                'Authorization' => 'Bearer ' .$this->crearToken(),
             ];          
             
             #validaciones

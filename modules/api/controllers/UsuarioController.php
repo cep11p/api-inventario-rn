@@ -81,7 +81,7 @@ class UsuarioController extends ActiveController
                 ],
                 [
                     'allow' => true,
-                    'actions' => ['index','create','update','view','buscar-persona-por-cuil','baja', 'crear-asignacion', 'listar-asignacion','borrar-asignacion'],
+                    'actions' => ['index','create','update','view','buscar-persona-por-cuil','baja','set-rol','unset-rol', 'crear-asignacion', 'listar-asignacion','borrar-asignacion'],
                     'roles' => ['soporte'],
                 ]
             ]
@@ -217,6 +217,28 @@ class UsuarioController extends ActiveController
         $params = Yii::$app->request->post();
         $resultado['success'] = false;
         if(User::setAsignacion($params)){
+            $resultado['success'] = true;
+            $resultado['mensaje'] = 'Asignaciones guardadas exitosamente!';
+        }
+
+        return $resultado;
+    }
+
+    public function actionSetRol(){
+        $params = Yii::$app->request->post();
+        $resultado['success'] = false;
+        if(User::setRol($params)){
+            $resultado['success'] = true;
+            $resultado['mensaje'] = 'Asignaciones guardadas exitosamente!';
+        }
+
+        return $resultado;
+    }
+
+    public function actionUnsetRols(){
+        $params = Yii::$app->request->post();
+        $resultado['success'] = false;
+        if(User::unsetRol($params)){
             $resultado['success'] = true;
             $resultado['mensaje'] = 'Asignaciones guardadas exitosamente!';
         }

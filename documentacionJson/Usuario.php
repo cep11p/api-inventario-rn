@@ -1,8 +1,7 @@
 <?php
 
-/**** Para mostrar listado ****/
-/*****Login****
-* @url http://api.inventario.local/api/usuarios/login
+/** Login
+* @url http://inventario.local/api/usuarios/login
 * @method POST
 * @param arrayJson
 {
@@ -10,31 +9,13 @@
   "password_hash":"admins"
 }
 * @return
-{
-    "nombre": "Victoria Margarita",
-    "apellido": "González",
-    "nro_documento": "23851266",
-    "cuil": "20068512669",
-    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MTQyMDYwMjMsInVzdWFyaW8iOiJhZG1pbiIsInVpZCI6MX0.gB1lraNxeF-6wsBpf4X0VA2Y8AypQKdkPk-9dxdupWA",
-    "username": "admin",
-    "rol": "soporte",
-    "lista_convenio": [
-        {
-            "id": "1",
-            "nombre": "8180"
-        },
-        {
-            "id": "2",
-            "nombre": "8277"
-        }
-    ]
-}
+* PENDIENTE
 **/
 
 
 
-/*****Para crear usuario****
-* @url http://api.inventario.local/api/usuarios 
+/** Para crear usuario
+* @url http://inventario.local/api/usuarios 
 * @method POST
 * @param arrayJson
 # Con persona existente
@@ -65,8 +46,8 @@
 }
 **/
 
-/****** Para visualizar*****
-* @url http://api.inventario.local/api/usuarios/2
+/** Para visualizar
+* @url http://inventario.local/api/usuarios/2
 * @method GET
 * @return arrayJson
 {
@@ -94,8 +75,8 @@
 }
 */
 
-/**** Para modificar*****
-* @url http://api.gps.local/api/usuarios/{$id} 
+/** Para modificar
+* @url http://inventario.local/api/usuarios/{$id} 
 * @method PUT
 * @param arrayJson
 {
@@ -106,19 +87,8 @@
 }
 **/
 
-/**** habilitar o deshabilitar un Usuarios*****
-* @url http://api.inventario.local/api/usuarios/baja/47 
-* @method PUT
-* @param arrayJson
-* @param['baja] = true or false
-{
-    "baja":true,
-	"descripcion_baja":"Esto es una descripcion de baja de usuario"
-}
-**/
-
 /** Buscar a un usuario por nro de cuil
- * @url http://api.inventario.local/api/usuarios/buscar-persona-por-cuil/20320542389
+ * @url http://inventario.local/api/usuarios/buscar-persona-por-cuil/20320542389
  * @method GET
  * @return arrayJson
  * 
@@ -150,57 +120,11 @@
   }
  **/
 
-/**** Crear Asignaciones a Usuarios*****
-* @url http://api.inventario.local/api/usuarios/crear-asignacion
+/** Setear rol a un Usuario
+* @url http://inventario.local/api/usuarios/crear-asignacion
 * @method POST
 * @param arrayJson
 {
 	"usuarioid": 15,
-	"lista_permiso":[
-		{"name":"cuenta_bps_importar"},
-		{"name":"cuenta_ver"}
-    ]
+	"rol" : "usuario"
 }
-
-/**** Listar Asignaciones a Usuarios*****
-* @url http://api.inventario.local/api/usuarios/listar-asignacion/14
-* @method GET
-* @param return
-[
-    {
-        "tipo_convenio": "8180",
-        "tipo_convenioid": "1",
-        "lista_permiso": [
-            "prestacion_borrar",
-            "cuenta_saldo_crear",
-            "cuenta_saldo_crear",
-            "persona_crear",
-            "cuenta_saldo_crear",
-            "persona_crear",
-            "prestacion_borrar"
-        ],
-        "usuarioid": 31
-    },
-    {
-        "tipo_convenio": "8277",
-        "tipo_convenioid": "2",
-        "lista_permiso": [
-            "cuenta_saldo_crear",
-            "persona_crear"
-        ],
-        "usuarioid": 31
-    }
-]
-
-/**** Borrar Asignaciones a Usuarios*****
-* @url http://api.inventario.local/api/usuarios/borrar-asignacion 
-* @method POST
-* @param arrayJson
-{
-    "lista_permiso": [
-        "cuenta_saldo_exportar",
-        "cuenta_ver"
-    ],
-    "usuarioid": 2
-}
-**/

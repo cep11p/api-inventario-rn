@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\components\Help;
 use app\components\ServicioInteroperable;
 use app\models\ApiUser;
 use Exception;
@@ -321,34 +322,45 @@ class User extends ApiUser
         return $id;
     }
 
-    public function setRol($rol)
+    static function setRol($param)
+    {
+        if(!isset($param['rol']) || empty($param['rol'])){
+            throw new \yii\web\HttpException(400, "Falta el rol a asignar.");
+        }
+
+        if(!isset($param['userid']) || empty($param['userid'])){
+            throw new \yii\web\HttpException(400, "Falta el usuario a ser asignado.");
+        }
+
+        $rol = $param['rol'];
+        $userid = $param['userid'];
+        #Chequeamos si el rol existe
+        if(AuthItem::findOne(['name'=>$rol,'type'=>AuthItem::ROLE])==NULL){
+            throw new \yii\web\HttpException(400, json_encode([['rol'=>'El rol '.$rol.' no existe']]));
+        }
+
+        ######### Asignamos el Rol ###########       
+        $auth_assignment = new AuthAssignment();
+        $auth_assignment->setAttributes(['item_name'=>$rol,'user_id'=>strval($userid)]);
+        if(!$auth_assignment->save()){
+            throw new \yii\web\HttpException(400, Help::ArrayErrorsToString($auth_assignment->errors));
+        }
+    }
+
+    static function unsetRol($rol)
     {
         #Chequeamos si el rol existe
         if(AuthItem::findOne(['name'=>$rol,'type'=>AuthItem::ROLE])==NULL){
             throw new \yii\web\HttpException(400, json_encode([['rol'=>'El rol '.$rol.' no existe']]));
         }
 
-        ######### Asignamos el Rol ###########
-        //Si el usuario tiene rol borramos y dsp lo recreamos
-        AuthAssignment::deleteAll(['user_id'=>$this->id, 'item_name'=>User::USUARIO]);
-        AuthAssignment::deleteAll(['user_id'=>$this->id, 'item_name'=>User::SOPORTE]);
-        AuthAssignment::deleteAll(['user_id'=>$this->id, 'item_name'=>User::ADMIN]);
-        
-
-        $auth_assignment = new AuthAssignment();
-        $auth_assignment->setAttributes(['item_name'=>$rol,'user_id'=>strval($this->id)]);
-        if(!$auth_assignment->save()){
-            throw new \yii\web\HttpException(400, json_encode([$auth_assignment->errors]));
-        }
-
-        ######### Fin de asignacion de Rol ###########
-
+        ######### Asignamos el Rol ###########       
+        $auth_assignment = AuthAssignment::findOne((['item_name'=>$rol,'user_id'=>strval($this->id)]));
+        $auth_assignment->delete();
     }
 
     /**
-     * Esta funcion inhabilitar un usuario
-     *
-     * @param [array] $params
+     * Esta funcion inhabilitar u *rol [array] $params
      * @return void
      */
     public function setBaja($params)

@@ -121,10 +121,21 @@
  **/
 
 /** Setear rol a un Usuario
-* @url http://inventario.local/api/usuarios/crear-asignacion
+* @url http://inventario.local/api/usuarios/set-rol
 * @method POST
 * @param arrayJson
 {
 	"usuarioid": 15,
 	"rol" : "usuario"
 }
+**/
+
+/** Borrar rol a un Usuario
+* @url http://inventario.local/api/usuarios/unset-rol
+* @method POST
+* @param arrayJson
+{
+	"usuarioid": 15,
+	"rol" : "usuario"
+}
+**/

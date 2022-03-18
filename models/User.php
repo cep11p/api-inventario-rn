@@ -345,18 +345,33 @@ class User extends ApiUser
         if(!$auth_assignment->save()){
             throw new \yii\web\HttpException(400, Help::ArrayErrorsToString($auth_assignment->errors));
         }
+
+        return true;
     }
 
-    static function unsetRol($rol)
+    static function unsetRol($param)
     {
+        if(!isset($param['rol']) || empty($param['rol'])){
+            throw new \yii\web\HttpException(400, "Falta el rol a asignar.");
+        }
+
+        if(!isset($param['userid']) || empty($param['userid'])){
+            throw new \yii\web\HttpException(400, "Falta el usuario a ser asignado.");
+        }
+
+        $rol = $param['rol'];
+        $userid = $param['userid'];
+
         #Chequeamos si el rol existe
         if(AuthItem::findOne(['name'=>$rol,'type'=>AuthItem::ROLE])==NULL){
             throw new \yii\web\HttpException(400, json_encode([['rol'=>'El rol '.$rol.' no existe']]));
         }
 
-        ######### Asignamos el Rol ###########       
-        $auth_assignment = AuthAssignment::findOne((['item_name'=>$rol,'user_id'=>strval($this->id)]));
+        ######### Borramos asignacion de Rol ###########       
+        $auth_assignment = AuthAssignment::findOne((['item_name'=>$rol,'user_id'=>strval($userid)]));
         $auth_assignment->delete();
+
+        return true;
     }
 
     /**

@@ -235,12 +235,12 @@ class UsuarioController extends ActiveController
         return $resultado;
     }
 
-    public function actionUnsetRols(){
+    public function actionUnsetRol (){
         $params = Yii::$app->request->post();
         $resultado['success'] = false;
         if(User::unsetRol($params)){
             $resultado['success'] = true;
-            $resultado['mensaje'] = 'Asignaciones guardadas exitosamente!';
+            $resultado['mensaje'] = 'Se borra una asignacion de rol';
         }
 
         return $resultado;

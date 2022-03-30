@@ -39,14 +39,33 @@ class User extends ApiUser
     }
 
      /**
-     * Se busca el usuario mediante una interoperabilidad
+     * Antes de realizar la validacion de permisos con el RBAC, vamos a chequear que el usuario tenga acceso a el modulo.
+     * Se busca el usuario mediante la interoperabilidad con api-user. Pero antes se realiza una validacion de token
      * @param int $id
      * @return User
      */
     static function findByUid($id){
-        $servicioInteroperable = new ServicioInteroperable();
-        $resultado = $servicioInteroperable->viewRegistro('user','usuario',['id' => $id]);
+        #Se descodifica el token para saber su origen
+        $headers = Yii::$app->request->headers;
+        if (preg_match('/^Bearer\s+(.*?)$/', $headers['authorization'], $matches)) {
+            $token = $matches[1];
+        } else {
+            throw new \yii\web\HttpException(403, 'Token invalido');
+        }
+        $decodedArray = static::decodeJWT($token);
+        if(!isset($decodedArray['token_origen']) || empty($decodedArray['token_origen'])){
+            throw new \yii\web\HttpException(403, "Se desconoce el origen del token.");
+        }
+        
+        #Chequeamos que el token no sea ajeno
+        if($decodedArray['token_origen'] != \Yii::$app->params['SERVICIO']){
+            throw new \yii\web\HttpException(403, "Este token es ajeno al sistema");
+        }
 
+        #vamos a obtener el usuario si el usuario esta habilitado para realizar la consulta
+        $servicioInteroperable = new ServicioInteroperable();
+        $resultado = $servicioInteroperable->checkUser('user','usuario',['userid' => $id, 'modulo' => \Yii::$app->params['SERVICIO']]);
+        
         $model = new self();
         $model->setAttributes($resultado);
         $model->id = $resultado['id'];
@@ -54,273 +73,6 @@ class User extends ApiUser
         return $model;
     }    
 
-    
-    static function limpiarPermisos($params){
-
-        #Chequeamos que exista el usuario
-        if(!isset($params['usuarioid']) || empty($params['usuarioid'])){
-            throw new \yii\web\HttpException(400, json_encode([['error'=>['Falta el usuario']]]));
-        }
-
-        #Chequeamos la lista de permisos
-        if(!isset($params['lista_permiso']) || empty($params['lista_permiso'])){
-            throw new \yii\web\HttpException(400, 'Falta la lista de permisos');
-        }
-
-        #Buscamos el permiso distinto a borrar
-        $permisos_a_borrar = AuthAssignment::find()->select('item_name')->leftJoin('auth_item i','item_name=i.name')->where(['user_id'=>$params['usuarioid'], 'i.type' => AuthItem::PERMISO])->distinct()->asArray()->all();
-
-        foreach ($params['lista_permiso'] as $k => $new_value) {
-            foreach ($permisos_a_borrar as $v => $bd_value) {
-                if ($new_value['name'] == $bd_value['item_name'] ) {
-                    unset($permisos_a_borrar[$v]);
-                }
-            }
-
-        }
-        
-        #Borramos los permisos (auth_assigment)
-        if(!empty($params['lista_permiso'])){
-            AuthAssignment::deleteAll([
-                'user_id'=>$params['usuarioid'],
-                'item_name'=>$permisos_a_borrar
-            ]);
-        }
-    }
-
-    public static function setAsignacion($params){
-        #Validamos que exista el usuario
-        if(User::findOne(['id'=>$params['usuarioid']])==NULL){
-            throw new \yii\web\HttpException(400, 'El usuario con el id '.$params['usuarioid'].' no existe!');
-        }
-        
-        $transaction = Yii::$app->db->beginTransaction();
-        try {
-            SELF::limpiarPermisos($params);
-
-            #Asignamos los permisos
-            foreach ($params['lista_permiso'] as $value) {
-                if((AuthAssignment::findOne(['item_name'=>$value['name'], 'user_id'=>strval($params['usuarioid'])])) === NULL){
-                    $auth_assignment = new AuthAssignment();
-                    $auth_assignment->setAttributes(['item_name'=>$value['name'],'user_id'=>strval($params['usuarioid'])]);
-                    if(!$auth_assignment->save()){
-                        throw new \yii\web\HttpException(400, json_encode([$auth_assignment->errors]));
-                    }
-                }
-            }
-            
-            $transaction->commit();
-
-            return true;
-        }catch (\yii\web\HttpException $exc) {
-            $transaction->rollBack();
-            $mensaje =$exc->getMessage();
-            $statuCode =$exc->statusCode;
-            throw new \yii\web\HttpException($statuCode, $mensaje);
-        }
-    }
-    
-
-    public function getAsignaciones(){
-
-        $i=0;
-        $query = new Query();        
-        $query->select([
-            '*'
-        ]);
-        $query->from('auth_assignment');
-        $query->leftJoin('auth_item as i','item_name=i.name');
-        $query->where([
-            'user_id' => $this->id,
-            'i.type' => AuthItem::PERMISO
-        ]);
-        
-        $command = $query->createCommand();
-        $rows = $command->queryAll();
-        
-        $permisos = array();
-        foreach ($rows as $value) {
-            $permisos[] = $value['item_name'];
-        }
-        $resultado['usuarioid'] = $this->id;
-        $resultado['lista_permiso'] = $permisos;
-                
-        return $resultado;
-    }
-
-    public function getTipoConveniosAsociados(){
-        $query = new Query();
-        
-        $query->select([
-            'tipo_convenio'=>'convenio.nombre',
-            'tipo_convenioid',
-        ]);
-
-        $query->from('usuario_has_convenio uhc1');
-        $query->leftJoin("tipo_convenio as convenio", "tipo_convenioid=convenio.id");
-        $query->where(['userid'=>$this->id]);
-        $query->groupBy('tipo_convenio');
-        
-        $command = $query->createCommand();
-        $rows = $command->queryAll();
-
-        return $rows;
-    }
-
-    /**
-     * Borramos los permisos de un usuario
-     *
-     * @param [array] $params
-     * @return void
-     */
-    public static function borrarAsignaciones($params){
-        #Validamos que exista el usuario
-        if(User::findOne(['id'=>$params['usuarioid']])==NULL){
-            throw new \yii\web\HttpException(400, 'El usuario con el id '.$params['usuarioid'].' no existe!');
-        }
-
-        if(!isset($params['lista_permiso']) || empty($params['lista_permiso'])){
-            throw new \yii\web\HttpException(400, 'Falta lista de permisos');
-        }
-
-        $transaction = Yii::$app->db->beginTransaction();
-        try {
-
-            AuthAssignment::deleteAll([
-                'user_id'=>$params['usuarioid'],
-                'item_name'=>$params['lista_permiso']
-            ]);
-
-            $transaction->commit();
-
-            return true;
-        }catch (\yii\web\HttpException $exc) {
-            $transaction->rollBack();
-            $mensaje =$exc->getMessage();
-            $statuCode =$exc->statusCode;
-            throw new \yii\web\HttpException($statuCode, $mensaje);
-        }
-    }
-
-    /**
-     * Se registra un usuario con su rol, perosonaid y localidadid
-     *
-     * @param [array] $params
-     * @return int id
-     */
-    static function registrarUsuario($params){
-        $id = '';
-        $user = new Self();
-        $user->scenario = 'create';
-        $lista_error = [];
-        #Chequeamos si la persona tiene usuario
-        if(!empty($params['personaid']) && UserPersona::findOne(['personaid'=>$params['personaid']])!=NULL){
-            throw new \yii\web\HttpException(400, 'La persona ya tiene un usuario');
-        }
-
-        #Chequeamos si el parametro usuario esta seteado
-        if(!isset($params['usuario']) || empty($params['usuario'])){
-            throw new \yii\web\HttpException(400, 'Falta el campo usuario con sus campos');
-        }
-        
-        #Chequeamos si la contraseña esta vacia
-        if(!isset($params['usuario']['password']) || empty($params['usuario']['password'])){
-            $user->addError('password','La contraseña no debe estar vacia.');
-
-        }
-        
-        #Registramos el usuario
-        if ( $user->load(['User'=>$params['usuario']]) && $user->create()) {
-            $id = $user->id;
-        }
-        
-        #Chequeamos si se puede regitrar el usuario
-        if($user->hasErrors() || count($lista_error)>0){
-            $lista_error = ArrayHelper::merge($lista_error, $user->errors);
-            throw new \yii\web\HttpException(400, json_encode(array($lista_error)));
-        }
-        
-        #Registamos Nueva Persona
-        if(!isset($params['usuario']['personaid']) || empty($params['usuario']['personaid'])){
-            $params['usuario']['personaid'] = $user->registrarPersona($params);
-        }
-        
-        #Vinculamos la persona
-        $userPersona = new UserPersona();
-        $userPersona->setAttributes($params['usuario']);
-        $userPersona->userid = $id;
-
-        if(!$userPersona->save()){
-            throw new \yii\web\HttpException(400, json_encode(array($userPersona->errors)));
-        }
-        
-        $user->setRol('usuario');
-
-        return $id;
-    }
-
-    /**
-     * Se registrar los datos personales de un usuario en sistema registral(Interoperabilidad)
-     *
-     * @param [array] $params
-     * @return [int] $personaid
-     */
-    private function registrarPersona($params){
-        $errors = [];
-        if(!isset($params['nro_documento']) || empty($params['nro_documento'])){
-            $errors['nro_documento'] = ['Se requiere nro de documento']; 
-        }
-        if(!isset($params['cuil']) || empty($params['cuil'])){
-            $errors['cuil'] = ['Se requiere cuil']; 
-        }
-        if(!isset($params['apellido']) || empty($params['apellido'])){
-            $errors['apellido'] = ['Se requiere apellido']; 
-        }
-        if(!isset($params['nombre']) || empty($params['nombre'])){
-            $errors['nombre'] = ['Se requiere nombre']; 
-        }
-
-        if(count($errors)>0){
-            throw new \yii\web\HttpException(400, json_encode([$errors]));
-        }
-
-        $resultado = \Yii::$app->registral->crearPersona($params);
-        if(isset($resultado->message)){
-            throw new \yii\web\HttpException(400, json_encode([$resultado->message]));
-        }
-        $personaid = intval($resultado);
-
-        return $personaid;
-    }
-
-    public function modificarUsuario($params){
-        $id = '';
-        $this->scenario = 'update';
-
-        #Registramos el usuario
-        if ( $this->load(['User'=>$params]) && $this->save()) {
-            $id = $this->id;
-        }
-
-        #Chequeamos si al modificar usuario hay errores
-        if($this->hasErrors()){
-            throw new \yii\web\HttpException(400, json_encode([$this->errors]));
-        }
-
-        #Vinculamos la persona
-        $userPersona = UserPersona::findOne(['userid'=>$id]);
-        $userPersona->setAttributes($params);
-
-        if(!$userPersona->save()){
-            throw new \yii\web\HttpException(400, json_encode([$userPersona->errors]));
-        }
-
-        if(isset($params['rol']) && (Yii::$app->user->can('admin'))){
-            $this->setRol($params['rol']);
-        }
-
-        return $id;
-    }
 
     static function setRol($param)
     {
@@ -425,48 +177,18 @@ class User extends ApiUser
         return $resultado;
     }
 
-
-    static function buscarPersonaPorCuil($cuil){
-        $resultado = \Yii::$app->registral->buscarPersonaPorCuil($cuil);
-                
-        if(count($resultado)>0){    
-            $data['id'] = $resultado['id'];       
-            $data['nro_documento'] = $resultado['nro_documento'];       
-            $data['cuil'] = $resultado['cuil'];       
-            $data['nombre'] = $resultado['nombre'];       
-            $data['apellido'] = $resultado['apellido'];
-
-            $usuarioPersona = UserPersona::findOne(['personaid'=>$resultado['id']]);
-            if($usuarioPersona!=null){
-                $data['usuario'] = User::findOne(['id'=>$usuarioPersona->userid])->toArray();
-                $data['usuario']['personaid'] = $usuarioPersona->personaid;
-                $data['usuario']['localidadid'] = $usuarioPersona->localidadid;
-                unset($data['usuario']['password_hash']);
-            }
-            
-        }else{
-            $data = false;  
-        }
-        
-        return $data;
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUserPersona()
-    {
-        return $this->hasOne(UserPersona::className(), ['userid' => 'id']);
-    }
-
+/**
+ * Obtenemos el rol del usuario
+ *
+ * @return void
+ */
     public function getRol(){
         $query = new Query();
         $query->select('name as rol')->from('auth_item');
 
         $query->leftJoin('auth_assignment','auth_assignment.item_name = auth_item.name');
-        $query->leftJoin('user','user.id = auth_assignment.user_id');
 
-        $query->where(['auth_item.type'=>AuthItem::ROLE, 'user.id'=>$this->id]);
+        $query->where(['auth_item.type'=>AuthItem::ROLE, 'auth_assignment.user_id'=>$this->id]);
 
         $command = $query->createCommand();
         $rows = $command->queryAll();
@@ -479,38 +201,7 @@ class User extends ApiUser
     public function fields()
     {
         $fields = ArrayHelper::merge(parent::fields(), [
-            "confirmed_at" => function () {
-                return date('Y-m-d',$this->confirmed_at);
-            },
-            "created_at" => function () {
-                return date('Y-m-d',$this->created_at);
-            },
-            "updated_at" => function () {
-                return date('Y-m-d',$this->updated_at);
-            },
-            "last_login_at" => function () {
-                return date('Y-m-d H:i:s',$this->last_login_at);
-            },
-            "last_login_ip" => function () {
-                return $this->userPersona->last_login_ip;
-            },
-            "personaid" => function () {
-                return $this->userPersona->personaid;
-            },
-            "fecha_baja" => function () {
-                return ($this->userPersona->fecha_baja)?$this->userPersona->fecha_baja:'';
-            },
-            "baja" => function () {
-                return ($this->userPersona->fecha_baja)?true:false;
-            },
-            "descripcion_baja" => function () {
-                return ($this->userPersona->descripcion_baja)?$this->userPersona->descripcion_baja:'';
-            },
-            "localidadid" => function () {
-                return $this->userPersona->localidadid;
-            },
             "rol"
-
         ]);
         
         unset($fields['password_hash'],$fields['auth_key']);

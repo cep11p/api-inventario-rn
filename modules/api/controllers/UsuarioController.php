@@ -158,6 +158,10 @@ class UsuarioController extends ActiveController
     public function actionLogin(){
         $resultado['estado']=false;
         $param = Yii::$app->request->post();
+        
+        #seteamos el modulo 
+        $param['servicio'] = \Yii::$app->params['SERVICIO'];
+
         $servicioInteroperable = new ServicioInteroperable();
         $resultado = $servicioInteroperable->login(self::SERVICIO_NAME,self::CONTROLLER_NAME,$param);
 
@@ -229,7 +233,7 @@ class UsuarioController extends ActiveController
         $resultado['success'] = false;
         if(User::setRol($params)){
             $resultado['success'] = true;
-            $resultado['mensaje'] = 'Asignaciones guardadas exitosamente!';
+            $resultado['mensaje'] = 'Asignacion de rol registrada exitosamente!';
         }
 
         return $resultado;

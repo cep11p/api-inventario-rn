@@ -233,7 +233,7 @@ class UsuarioController extends ActiveController
         $resultado['success'] = false;
         if(User::setRol($params)){
             $resultado['success'] = true;
-            $resultado['mensaje'] = 'Asignacion de rol registrada exitosamente!';
+            $resultado['mensaje'] = 'Rol asignado exitosamente!';
         }
 
         return $resultado;

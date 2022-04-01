@@ -333,6 +333,14 @@ class ServicioInteroperable extends Component
         }
     }
 
+    /**
+     * Se chequea si el usuario esta habilitado en api-user
+     *
+     * @param [string] $api
+     * @param [string] $controller
+     * @param [array] $param
+     * @return array user
+     */
     public function checkUser($api,$controller,$param)
     {
         $client =   $this->_client;

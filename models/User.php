@@ -52,19 +52,10 @@ class User extends ApiUser
         } else {
             throw new \yii\web\HttpException(403, 'Token invalido');
         }
-        $decodedArray = static::decodeJWT($token);
-        if(!isset($decodedArray['token_origen']) || empty($decodedArray['token_origen'])){
-            throw new \yii\web\HttpException(403, "Se desconoce el origen del token.");
-        }
-        
-        #Chequeamos que el token no sea ajeno
-        if($decodedArray['token_origen'] != \Yii::$app->params['SERVICIO']){
-            throw new \yii\web\HttpException(403, "Este token es ajeno al sistema");
-        }
 
         #vamos a obtener el usuario si el usuario esta habilitado para realizar la consulta
         $servicioInteroperable = new ServicioInteroperable();
-        $resultado = $servicioInteroperable->checkUser('user','usuario',['userid' => $id, 'modulo' => \Yii::$app->params['SERVICIO']]);
+        $resultado = $servicioInteroperable->checkUser('user','usuario',['userid' => $id]);
         
         $model = new self();
         $model->setAttributes($resultado);

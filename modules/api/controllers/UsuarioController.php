@@ -158,9 +158,6 @@ class UsuarioController extends ActiveController
     public function actionLogin(){
         $resultado['estado']=false;
         $param = Yii::$app->request->post();
-        
-        #seteamos el modulo 
-        $param['servicio'] = \Yii::$app->params['SERVICIO'];
 
         $servicioInteroperable = new ServicioInteroperable();
         $resultado = $servicioInteroperable->login(self::SERVICIO_NAME,self::CONTROLLER_NAME,$param);

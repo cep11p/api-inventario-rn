@@ -65,6 +65,11 @@ class User extends ApiUser
     }    
 
 
+    /**
+     * Se vincula el usuario con el rol. Si ya existe la vinculacion no se tira ninguna excepcion
+     * @param [array] $param
+     * @return void
+     */
     static function setRol($param)
     {
         if(!isset($param['rol']) || empty($param['rol'])){
@@ -77,16 +82,25 @@ class User extends ApiUser
 
         $rol = $param['rol'];
         $userid = $param['userid'];
+
+        #Chequeamos si el usuario existe
+        if(Usuario::findOne(['id'=>$userid])==NULL){
+            throw new \yii\web\HttpException(400, json_encode([['usuario'=>'El usuario '.$userid.' no existe']]));
+        }
+
         #Chequeamos si el rol existe
         if(AuthItem::findOne(['name'=>$rol,'type'=>AuthItem::ROLE])==NULL){
             throw new \yii\web\HttpException(400, json_encode([['rol'=>'El rol '.$rol.' no existe']]));
         }
 
         ######### Asignamos el Rol ###########       
-        $auth_assignment = new AuthAssignment();
-        $auth_assignment->setAttributes(['item_name'=>$rol,'user_id'=>strval($userid)]);
-        if(!$auth_assignment->save()){
-            throw new \yii\web\HttpException(400, Help::ArrayErrorsToString($auth_assignment->errors));
+        $auth_assignment = AuthAssignment::findOne(['item_name'=>$rol,'user_id'=>strval($userid)]);
+        if($auth_assignment == null){
+            $auth_assignment = new AuthAssignment();
+            $auth_assignment->setAttributes(['item_name'=>$rol,'user_id'=>strval($userid)]);
+            if(!$auth_assignment->save()){
+                throw new \yii\web\HttpException(400, Help::ArrayErrorsToString($auth_assignment->errors));
+            }
         }
 
         return true;

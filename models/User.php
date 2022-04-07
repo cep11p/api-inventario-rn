@@ -62,7 +62,80 @@ class User extends ApiUser
         $model->id = $resultado['id'];
 
         return $model;
-    }    
+    }   
+    
+    /**
+     * Se vincula los permisos al usuario. Si el usuario ya tiene vinculado el permiso, no debe ser un error
+     *
+     * @param [array] $params
+     * @param [int] $params['userid']
+     * @param [array] $params['lista_permiso']
+     * @return void
+     */
+    static function setAsignacion($params){
+        #Validamos que exista el usuario
+        if(Usuario::findOne(['id'=>$params['userid']])==NULL){
+            throw new \yii\web\HttpException(400, 'El usuario con el id '.$params['userid'].' no existe!');
+        }
+        
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            SELF::limpiarPermisos($params);
+
+            #Asignamos los permisos
+            foreach ($params['lista_permiso'] as $value) {
+                if((AuthAssignment::findOne(['item_name'=>$value['name'], 'user_id'=>strval($params['userid'])])) === NULL){
+                    $auth_assignment = new AuthAssignment();
+                    $auth_assignment->setAttributes(['item_name'=>$value['name'],'user_id'=>strval($params['userid'])]);
+                    if(!$auth_assignment->save()){
+                        throw new \yii\web\HttpException(400, json_encode([$auth_assignment->errors]));
+                    }
+                }
+            }
+            
+            $transaction->commit();
+
+            return true;
+        }catch (\yii\web\HttpException $exc) {
+            $transaction->rollBack();
+            $mensaje =$exc->getMessage();
+            $statuCode =$exc->statusCode;
+            throw new \yii\web\HttpException($statuCode, $mensaje);
+        }
+    }
+
+    static function limpiarPermisos($params){
+
+        #Chequeamos que exista el usuario
+        if(!isset($params['userid']) || empty($params['userid'])){
+            throw new \yii\web\HttpException(400, json_encode([['error'=>['Falta el usuario']]]));
+        }
+
+        #Chequeamos la lista de permisos
+        if(!isset($params['lista_permiso']) || empty($params['lista_permiso'])){
+            throw new \yii\web\HttpException(400, 'Falta la lista de permisos');
+        }
+
+        #Buscamos el permiso distinto a borrar
+        $permisos_a_borrar = AuthAssignment::find()->select('item_name')->leftJoin('auth_item i','item_name=i.name')->where(['user_id'=>$params['userid'], 'i.type' => AuthItem::PERMISO])->distinct()->asArray()->all();
+
+        foreach ($params['lista_permiso'] as $k => $new_value) {
+            foreach ($permisos_a_borrar as $v => $bd_value) {
+                if ($new_value['name'] == $bd_value['item_name'] ) {
+                    unset($permisos_a_borrar[$v]);
+                }
+            }
+
+        }
+        
+        #Borramos los permisos (auth_assigment)
+        if(!empty($params['lista_permiso'])){
+            AuthAssignment::deleteAll([
+                'user_id'=>$params['userid'],
+                'item_name'=>$permisos_a_borrar
+            ]);
+        }
+    }
 
 
     /**
@@ -83,10 +156,9 @@ class User extends ApiUser
         $rol = $param['rol'];
         $userid = $param['userid'];
 
-        #Chequeamos si el usuario existe
-        if(Usuario::findOne(['id'=>$userid])==NULL){
-            throw new \yii\web\HttpException(400, json_encode([['usuario'=>'El usuario '.$userid.' no existe']]));
-        }
+        #Chequeamos si el usuario existe (interoperabilidad con api-user)
+        $servicioInteroperable = new ServicioInteroperable();
+        $servicioInteroperable->viewRegistro('user','usuario',['id' => $param['userid']]);
 
         #Chequeamos si el rol existe
         if(AuthItem::findOne(['name'=>$rol,'type'=>AuthItem::ROLE])==NULL){
@@ -103,7 +175,26 @@ class User extends ApiUser
             }
         }
 
+        #Activamos el usuario si nunca fue activado en el modulo
+        self::activarUsuario($userid);
+
         return true;
+    }
+
+    /**
+     * Se el usuario no existe en el modulo lo registramos
+     *
+     * @param [int] $id
+     * @return void
+     */
+    static function activarUsuario($id){
+        if(Usuario::findOne(['id' => $id]) == null){
+            $model = new Usuario();
+            $model->id = $id;
+            if(!$model->save()){
+                throw new \yii\web\HttpException(400, Help::ArrayErrorsToString($model->errors));
+            }
+        }
     }
 
     static function unsetRol($param)

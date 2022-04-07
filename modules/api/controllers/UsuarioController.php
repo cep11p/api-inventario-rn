@@ -215,8 +215,10 @@ class UsuarioController extends ActiveController
      * @return void
      */
     public function actionCrearAsignacion(){
+        
         $params = Yii::$app->request->post();
         $resultado['success'] = false;
+        
         if(User::setAsignacion($params)){
             $resultado['success'] = true;
             $resultado['mensaje'] = 'Asignaciones guardadas exitosamente!';

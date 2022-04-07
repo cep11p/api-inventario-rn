@@ -111,11 +111,11 @@ class ServicioInteroperable extends Component
     }
 
     /**
-     * Esta función visualiza un registro
+     * Esta función visualiza un registro si la encuentra
      *
-     * @param [type] $api
-     * @param [type] $controller
-     * @param [type] $param
+     * @param [string] $api
+     * @param [string] $controller
+     * @param [array] $param
      * @return array
      */
     public function viewRegistro($api,$controller,$param)

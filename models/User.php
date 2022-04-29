@@ -38,31 +38,31 @@ class User extends ApiUser
         );
     }
 
-     /**
-     * Antes de realizar la validacion de permisos con el RBAC, vamos a chequear que el usuario tenga acceso a el modulo.
-     * Se busca el usuario mediante la interoperabilidad con api-user. Pero antes se realiza una validacion de token
-     * @param int $id
-     * @return User
-     */
-    static function findByUid($id){
-        #Se descodifica el token para saber su origen
-        $headers = Yii::$app->request->headers;
-        if (preg_match('/^Bearer\s+(.*?)$/', $headers['authorization'], $matches)) {
-            $token = $matches[1];
-        } else {
-            throw new \yii\web\HttpException(403, 'Token invalido');
-        }
+    //  /** CONFIGURACION PARA LA CENTRALIZACION DE USUARIO
+    //  * Antes de realizar la validacion de permisos con el RBAC, vamos a chequear que el usuario tenga acceso a el modulo.
+    //  * Se busca el usuario mediante la interoperabilidad con api-user. Pero antes se realiza una validacion de token
+    //  * @param int $id
+    //  * @return User
+    //  */
+    // static function findByUid($id){
+    //     #Se descodifica el token para saber su origen
+    //     $headers = Yii::$app->request->headers;
+    //     if (preg_match('/^Bearer\s+(.*?)$/', $headers['authorization'], $matches)) {
+    //         $token = $matches[1];
+    //     } else {
+    //         throw new \yii\web\HttpException(403, 'Token invalido');
+    //     }
 
-        #vamos a obtener el usuario si el usuario esta habilitado para realizar la consulta
-        $servicioInteroperable = new ServicioInteroperable();
-        $resultado = $servicioInteroperable->checkUser('user','usuario',['userid' => $id]);
+    //     #vamos a obtener el usuario si el usuario esta habilitado para realizar la consulta
+    //     $servicioInteroperable = new ServicioInteroperable();
+    //     $resultado = $servicioInteroperable->checkUser('user','usuario',['userid' => $id]);
         
-        $model = new self();
-        $model->setAttributes($resultado);
-        $model->id = $resultado['id'];
+    //     $model = new self();
+    //     $model->setAttributes($resultado);
+    //     $model->id = $resultado['id'];
 
-        return $model;
-    }   
+    //     return $model;
+    // }   
     
     /**
      * Se vincula los permisos al usuario. Si el usuario ya tiene vinculado el permiso, no debe ser un error

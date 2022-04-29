@@ -20,7 +20,7 @@ services:
     image: mariadb:10.4
     restart: always
     volumes:
-     - inventario-vol:/var/lib/mysql
+     - inventario-rn-vol:/var/lib/mysql
     environment:
      MYSQL_ROOT_PASSWORD: root
     ports:
@@ -50,4 +50,4 @@ networks:
 
 ####VOLUMES
 volumes:
-  inventario-vol:
+  inventario-rn-vol:

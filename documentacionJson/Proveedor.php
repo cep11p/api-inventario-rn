@@ -10,17 +10,20 @@
         {
             "id": 2,
             "nombre": "provedor1",
-            "cuit": "20368498689"
+            "cuit": "20368498689",
+            "telefono": "15412163"
         },
         {
             "id": 3,
             "nombre": "provedor2",
-            "cuit": "20368498689"
+            "cuit": "20368498689",
+            "telefono": "15412163"
         },
         {
             "id": 4,
             "nombre": "provedor3",
-            "cuit": "20368498689"
+            "cuit": "20368498689",
+            "telefono": "15412163"
         }
     ]
 * @arrayReturn SIN PAGINACION
@@ -32,17 +35,20 @@
         {
             "id": 2,
             "nombre": "provedor1",
-            "cuit": "20368498689"
+            "cuit": "20368498689",
+            "telefono": "15412163"
         },
         {
             "id": 3,
             "nombre": "provedor2",
-            "cuit": "20368498689"
+            "cuit": "20368498689",
+            "telefono": "15412163"
         },
         {
             "id": 4,
             "nombre": "provedor3",
-            "cuit": "20368498689"
+            "cuit": "20368498689",
+            "telefono": "15412163"
         }
     ]
 }
@@ -54,12 +60,14 @@
 * @param arrayJson
     {
         "nombre": "provedor3",
-        "cuit": "20368498689"
+        "cuit": "20368498689",
+        "telefono": "15412163"
     }
 * @return json
     {
         "nombre": "Provedor3",
-        "cuit": "20368498689"
+        "cuit": "20368498689",
+        "telefono": "15412163"
     }
 **/
 
@@ -69,12 +77,14 @@
 * @param arrayJson
     {
         "nombre": "provedor3",
-        "cuit": "20368498689"
+        "cuit": "20368498689",
+        "telefono": "15412163"
     }
 * @return json
 {
     "nombre": "Provedor modificado",
-    "cuit": "20368498321"
+    "cuit": "20368498321",
+    "telefono": "15412163"
 }
 **/
 
@@ -85,7 +95,8 @@
     {
         "id": 3,
         "nombre": "Provedor modificado",
-        "cuit": "20368498321"
+        "cuit": "20368498321",
+        "telefono": "15412163"
     }
 */
 

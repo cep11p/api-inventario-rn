@@ -1,6 +1,8 @@
 <?php
 namespace app\modules\api\controllers;
 
+use app\components\ServicioInteroperable;
+use app\components\ServicioInventario;
 use yii\rest\ActiveController;
 use yii\web\Response;
 
@@ -67,11 +69,12 @@ class LocalidadController extends ActiveController{
         $param = Yii::$app->request->queryParams;
         $param['provinciaid'] = 16; // Rio negro
         $param['extra'] = 1; // Seteamos el flags para injectar localidades extras
-        $param['pagesize'] = 5000; // Seteamos el flags para injectar localidades extras
+        // $param['pagesize'] = 5000; // Seteamos el flags para injectar localidades extras
 
-        $resultado = \Yii::$app->lugar->buscarLocalidad($param);
+        $servicioInteroperable = new ServicioInteroperable();
+        $resultado = $servicioInteroperable->buscarRegistro('lugar','localidad',$param);
         
-        return $resultado['resultado'];
+        return $resultado;
 
     }
 

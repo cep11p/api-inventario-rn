@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\components\ServicioInteroperable;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -115,8 +116,12 @@ class EgresoSearch extends Egreso
             }
             
         }
+
+        $servicioInteroperable = new ServicioInteroperable();
+        $response = $servicioInteroperable->buscarRegistro('lugar','localidad',["ids"=>$ids,"pagesize"=>$pagesize]);
         
-        $response = \Yii::$app->lugar->buscarLocalidad(array("ids"=>$ids,"pagesize"=>$pagesize));
+        
+        // $response = \Yii::$app->lugar->buscarLocalidad(array("ids"=>$ids,"pagesize"=>$pagesize));
         if(isset($response['success']) && $response['success']==true){
             $resultado = $response['resultado'];
         }

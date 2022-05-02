@@ -39,12 +39,12 @@ $config = [
 //        'fixture' => [ // Fixture generation command line.
 //            'class' => 'yii\faker\FixtureController',
 //        ],
-        'migrate' => [
-            'class' => 'yii\console\controllers\MigrateController',
-            'migrationNamespaces' => [
-                'bedezign\yii2\audit\migrations',
-            ],
-        ],
+        // 'migrate' => [
+        //     'class' => 'yii\console\controllers\MigrateController',
+        //     'migrationNamespaces' => [
+        //         'bedezign\yii2\audit\migrations',
+        //     ],
+        // ],
     ],
 ];
 

@@ -53,7 +53,6 @@ class CategoriaSearch extends Categoria
                 "page"=>(isset($params['page']) && is_numeric($params['page']))?$params['page']:0
             ];
         }
-
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'pagination' => $paginacion
@@ -89,13 +88,11 @@ class CategoriaSearch extends Categoria
             $paginas = ceil($dataProvider->totalCount/$pagesize);           
             $resultado['pagesize']=$pagesize;            
             $resultado['pages']=$paginas;            
+            $resultado['total_filtrado']=$dataProvider->totalCount;
+            $resultado['resultado']=$coleccion;
         }else{
-            $resultado['pagesize']=0;            
-            $resultado['pages']=1;    
+            $resultado = $coleccion;
         }
-                    
-        $resultado['total_filtrado']=$dataProvider->totalCount;
-        $resultado['resultado']=$coleccion;
 
 
         return $resultado;

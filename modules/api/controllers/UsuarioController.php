@@ -102,7 +102,7 @@ class UsuarioController extends ActiveController
         $searchModel = new \app\models\UserSearch();
         $params = \Yii::$app->request->queryParams;
         $resultado = $searchModel->search($params);
-
+        
         $resultado['resultado'] = VinculoInteroperableHelp::vincularDatosLocalidad($resultado['resultado']);
         $resultado['resultado'] = VinculoInteroperableHelp::vincularDatosPersona($resultado['resultado'],['nombre','apellido','nro_documento','cuil']);
 

@@ -45,7 +45,7 @@ class UserSearch extends User
     {
         $query = User::find();
         $localidadid = (isset($params['localidadid']) && !empty($params['localidadid']))?$params['localidadid']:'';
-
+        
         $pagesize = (!isset($params['pagesize']) || !is_numeric($params['pagesize']) || $params['pagesize']==0)?20:intval($params['pagesize']);
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -54,21 +54,21 @@ class UserSearch extends User
                 'page' => (isset($params['page']) && is_numeric($params['page']))?$params['page']:0
             ],
         ]);
-
+        
         $this->load($params,'');
-
+        
         if (!$this->validate()) {
             // uncomment the following line if you do not want to any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
         }
-
+        
         #global search #global param
         $personaForm = new PersonaForm();
         if(isset($params['global_param']) && !empty($params['global_param'])){
             $persona_params["global_param"] = $params['global_param'];
         }
-                
+        
         $lista_personaid = array();
         if (isset($persona_params)) {
             #Filtramos persona
@@ -78,8 +78,8 @@ class UserSearch extends User
                 $query->where('0=1');
             }
         }
-         #Criterio para buscar por persona
-         if(count($lista_personaid)>0){
+        #Criterio para buscar por persona
+        if(count($lista_personaid)>0){
             $query->andWhere(array('in', 'user_persona.personaid', $lista_personaid));
         }
 
@@ -87,7 +87,7 @@ class UserSearch extends User
         if(isset($params['global_param']) && !empty($params['global_param'])){
             $query->orFilterWhere(['or',['like','username',$params['global_param']]]);
         }
-       
+        
         #Vinculamos los permisos asociados
         $query->leftJoin("auth_assignment as assig", "id=assig.user_id");
         $query->leftJoin("auth_item as item", "name=assig.item_name");
@@ -99,7 +99,7 @@ class UserSearch extends User
         
         $query->andFilterWhere(['like', 'username', $this->username]);
         $query->andFilterWhere(['user_persona.localidadid'=>$localidadid]);
-
+        
         #### Filtro por rango de fecha (create_at)####
         if(isset($params['fecha_ingreso_desde']) && isset($params['fecha_ingreso_hasta'])){
             $query->andWhere(['between', 'last_login_at', DateTime::createFromFormat('Y-m-d', $params['fecha_ingreso_desde'])->getTimestamp(), DateTime::createFromFormat('Y-m-d', $params['fecha_ingreso_hasta'])->getTimestamp()]);
@@ -113,7 +113,7 @@ class UserSearch extends User
         foreach ($dataProvider->getModels() as $value) {
             $coleccion[] = $value->toArray();
         }
-
+        
         $coleccion = VinculoInteroperableHelp::vincularDatosPersona($coleccion,['apellido','nombre','nro_documento','cuil']);
         
         $paginas = ceil($dataProvider->totalCount/$pagesize);           

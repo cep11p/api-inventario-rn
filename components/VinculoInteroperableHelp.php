@@ -87,8 +87,10 @@ class VinculoInteroperableHelp extends \yii\base\Component{
         }
         
         $coleccion = [];
-        if(isset($lista)){
-            $response = \Yii::$app->lugar->buscarLocalidad(array("ids"=>$ids,"pagesize"=>$pagesize));   
+        if(isset($lista)){  
+            $servicioInteroperable = new ServicioInteroperable();
+            $response = $servicioInteroperable->buscarRegistro('registral','persona',array("ids"=>$ids,"pagesize"=>$pagesize));
+        
         }
 
         if(isset($response['resultado']) && count($response['resultado'])>0){

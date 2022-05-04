@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\components\Help;
+use app\components\ServicioInteroperable;
 use yii\helpers\ArrayHelper;
 use Yii;
 use yii\base\Model;
@@ -301,7 +302,9 @@ class PersonaForm extends Model
      */
     static function buscarPersonaEnRegistral($param){
         $resultado = array();
-        $response = \Yii::$app->registral->buscarPersona($param); 
+        // $response = \Yii::$app->registral->buscarPersona($param); 
+        $servicioInteroperable = new ServicioInteroperable();
+        $response = $servicioInteroperable->buscarRegistro('registral','persona',$param);
         
         if(isset($response['estado']) && $response['estado']==true){
             

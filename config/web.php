@@ -101,6 +101,16 @@ $config = [
                         'OPTIONS aprobar/{id}' => 'aprobar',
                     ], 
                 ],
+                //EXPORT
+                [   
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'api/export',
+                    'extraPatterns' => [
+                        'GET acta-egreso' => 'acta-egreso',
+                        'OPTIONS acta-egreso' => 'acta-egreso',
+                    ], 
+                    'tokens' => ['{id}'=>'<id:\\w+>'],          
+                ],
                 [   
                     'class' => 'yii\rest\UrlRule',
                     'controller' => 'api/deposito'

@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\components\ServicioInteroperable;
 use Yii;
 use \app\models\base\Egreso as BaseEgreso;
 use yii\helpers\ArrayHelper;
@@ -55,7 +56,9 @@ class Egreso extends BaseEgreso
         
         $resultado = null;
 
-        $response = \Yii::$app->lugar->buscarLocalidadPorId($this->destino_localidadid);   
+        $servicioInteroperable = new ServicioInteroperable();
+        $response = $servicioInteroperable->buscarRegistro('lugar','localidad',["ids"=>$this->destino_localidadid]);
+        
         /** Chequeamos si existe el nombre de la localidad **/
         if(isset($response['nombre']) && !empty($response['nombre'])){
             $resultado = $response['nombre'];

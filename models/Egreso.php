@@ -123,6 +123,17 @@ class Egreso extends BaseEgreso
             
             $resultado += $this->setEgreso($condicion, $cantidad);
 
+            #Vamos a registrar la descripcion de cada producto con su cantidad
+            $egreso_descripcion = new EgresoDescripcion();
+            $egreso_descripcion->egresoid = $this->id;
+            $egreso_descripcion->productoid = $value['productoid'];
+            $egreso_descripcion->cantidad = $value['cantidad'];
+            $egreso_descripcion->descripcion = $value['descripcion'];
+
+            if(!$egreso_descripcion->save()){
+                throw new Exception(json_encode($egreso_descripcion->errors));
+            }
+
         }
         
         return $resultado;

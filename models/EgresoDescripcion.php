@@ -31,4 +31,14 @@ class EgresoDescripcion extends BaseEgresoDescripcion
             ]
         );
     }
+
+    public function fields()
+    {
+        return ArrayHelper::merge(parent::fields(), [
+            'producto'=> function($model){
+                return $model->producto->nombre.', '.$model->producto->unidad_valor.$model->producto->unidadMedida->simbolo.' ('.$model->producto->marca->nombre.')';
+            }
+        ]);
+        
+    }
 }

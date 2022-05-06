@@ -60,17 +60,17 @@ class EgresoSearch extends Egreso
             // $query->where('0=1');
             return $dataProvider;
         }
-
+        
         $query->andFilterWhere([
             'id' => $this->id,
             'fecha' => $this->fecha,
             'destino_localidadid' => $this->destino_localidadid,
         ]);
-
+        
         $query->andFilterWhere(['like', 'origen', $this->global_param])
-            ->orFilterWhere(['like', 'destino_nombre', $this->global_param])
-            ->orFilterWhere(['like', 'descripcion', $this->global_param])
-            ->orFilterWhere(['like', 'nro_acta', $this->global_param]);
+        ->orFilterWhere(['like', 'destino_nombre', $this->global_param])
+        ->orFilterWhere(['like', 'descripcion', $this->global_param])
+        ->orFilterWhere(['like', 'nro_acta', $this->global_param]);
         
         #### Filtro por rango de fecha ####
         if(isset($params['fecha_desde']) && isset($params['fecha_hasta'])){
@@ -81,7 +81,7 @@ class EgresoSearch extends Egreso
             $query->andWhere(['between', 'fecha', '1970-01-01', $params['fecha_hasta']]);
         }
         
-   
+        
         
         $coleccion = array();
         foreach ($dataProvider->getModels() as $value) {

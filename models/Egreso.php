@@ -78,6 +78,15 @@ class Egreso extends BaseEgreso
     }
     
     /**
+     * Se obtienen la descripcion de los productos de un egreso
+     * @return array
+     */
+    public function getListaProductoDescripcion() {
+        $lista_producto = EgresoDescripcion::find()->where(['egresoid' => $this->id])->all();
+        return $lista_producto;
+    }
+
+    /**
      * Se crea la lista de los productos que egresan
      * @param array $param
      * @return int cantidad egresados

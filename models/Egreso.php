@@ -7,6 +7,8 @@ use Yii;
 use \app\models\base\Egreso as BaseEgreso;
 use yii\helpers\ArrayHelper;
 use yii\base\Exception;
+use yii\db\Query;
+
 /**
  * This is the model class for table "egreso".
  */
@@ -78,12 +80,31 @@ class Egreso extends BaseEgreso
     }
     
     /**
-     * Se obtienen la descripcion de los productos de un egreso
-     * @return array
+     * Se obtienen los productos con sus descripciones listo para ser exportados. Esto es obtenido mediante consulta de sql con Query()
+     * @return array $resultado['producto']
+     * @return array $resultado['descripcion']
+     * @return array $resultado['cantidad']
      */
     public function getListaProductoDescripcion() {
-        $lista_producto = EgresoDescripcion::find()->where(['egresoid' => $this->id])->all();
-        return $lista_producto;
+
+        $query = new Query();
+        
+        $query->select([
+            'producto'=> "CONCAT(p.nombre,' ',p.unidad_valor,' ',um.simbolo,' (',ma.nombre,')')",
+            'descripcion' => 'ed.descripcion',
+            'cantidad' => 'cantidad',
+        ]);
+        $query->from(['egreso_descripcion as ed']);
+        $query->leftJoin('producto p', 'p.id=ed.productoid');
+        $query->leftJoin('unidad_medida um', 'um.id=p.unidad_medidaid');
+        $query->leftJoin('marca ma', 'ma.id=p.marcaid');
+        $query->where(['ed.egresoid' => $this->id]);
+        
+        
+        $command = $query->createCommand();        
+        $rows = $command->queryAll();
+
+        return $rows;
     }
 
     /**

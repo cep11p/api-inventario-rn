@@ -20,8 +20,9 @@ use Yii;
  * @property integer $id
  * @property string $suscrito
  *
- * @property \app\models\TipoEgreso $tipoEgreso
+ * @property \app\models\EgresoDescripcion[] $egresoDescripcions
  * @property \app\models\Inventario[] $inventarios
+ * @property \app\models\TipoEgreso $tipoEgreso
  * @property string $aliasModel
  */
 abstract class Egreso extends \yii\db\ActiveRecord
@@ -76,9 +77,9 @@ abstract class Egreso extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getTipoEgreso()
+    public function getEgresoDescripcions()
     {
-        return $this->hasOne(\app\models\TipoEgreso::className(), ['id' => 'tipo_egresoid']);
+        return $this->hasMany(\app\models\EgresoDescripcion::className(), ['egresoid' => 'id']);
     }
 
     /**
@@ -87,6 +88,14 @@ abstract class Egreso extends \yii\db\ActiveRecord
     public function getInventarios()
     {
         return $this->hasMany(\app\models\Inventario::className(), ['egresoid' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTipoEgreso()
+    {
+        return $this->hasOne(\app\models\TipoEgreso::className(), ['id' => 'tipo_egresoid']);
     }
 
 

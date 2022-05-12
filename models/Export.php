@@ -11,6 +11,12 @@ use yii\base\Exception;
 class Export
 {
 
+    /**
+     * Mediante el id de un egreso obtenemos la lista de productos para armar el acta de entrega. Como resultado tenemos un PDF
+     *
+     * @param [array] $param['id']
+     * @return void
+     */
     static function exportarActaEgreso($param)
     {
         $model = Egreso::findOne(['id'=>$param['id']]);
@@ -18,8 +24,8 @@ class Export
         if($model==null){
             throw new Exception(json_encode('El egreso no existe'));
         }
-        #Cargamos parametros dinamicos
-        $lista_producto = $model->getListaProducto();
+        #Cargamos parametros
+        $lista_producto = $model->getListaProductoDescripcion();
         $acta = $model->nro_acta;
         $acta_numero = "$acta/".date('y');
         $fecha = date('d/m/Y');
@@ -34,8 +40,6 @@ class Export
         $spreadsheet->getActiveSheet()->getStyle('A1:M1')->getFont()->setBold('true')->setUnderline(true);
         $spreadsheet->getActiveSheet()->getStyle('A1:M1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
-        
-        
         $sheet = $spreadsheet->getActiveSheet();
 
         $sheet->setMergeCells(["A1:M1","A3:M3","A5:M5","A7:M7","A9:M9","A11:M11"]);
@@ -70,7 +74,7 @@ class Export
         $sheet->setCellValue("F$row", 'Descripcion')->getStyle("F$row")->getFont()->setBold('true');
         $sheet->getCell("F$row")->getStyle()->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_HAIR);
        
-        #Lista de productos Creacion Dinamica
+        #Tabla con lista de productos Creacion Dinamica (se va calculando las cantidad de filas)
         $row ++;
         foreach ($lista_producto as $value) {
             $sheet->mergeCells("A$row:D$row");
@@ -82,7 +86,7 @@ class Export
             $sheet->setCellValue("E$row", $value['cantidad']);
             $sheet->getCell("E$row")->getStyle()->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_HAIR);
 
-            $sheet->setCellValue("F$row", 'Descripcion X');
+            $sheet->setCellValue("F$row", $value['descripcion']);
             $sheet->getCell("F$row")->getStyle()->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_HAIR);
             $row++;
         }

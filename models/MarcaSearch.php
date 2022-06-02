@@ -67,6 +67,9 @@ class MarcaSearch extends Marca
             return $dataProvider;
         }
 
+        #se ordena el listado de marca por nombre
+        $query->orderBy('nombre');
+
         $query->andFilterWhere([
             'id' => $this->id,
             'activo' => ($paginacion==false)?1:$this->activo,

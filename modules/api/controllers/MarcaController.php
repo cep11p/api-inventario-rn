@@ -62,6 +62,7 @@ class MarcaController extends ActiveController{
     {
         $searchModel = new \app\models\MarcaSearch();
         $params = \Yii::$app->request->queryParams;
+       
         $resultado = $searchModel->search($params);
 
         return $resultado;
